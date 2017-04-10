@@ -1,0 +1,8 @@
+-------------------TempMT_Index工作环境要求-------------------------------
+mysql5.6.24
+账号root密码root
+tomcat7.0
+jdk1.8
+j2ee
+eclipse
+xampp

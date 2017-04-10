@@ -1,0 +1,1 @@
+2017-03-31 15:13:09,746 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:154) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5000k' already exists

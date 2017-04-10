@@ -1,0 +1,14 @@
+2017-04-07 19:51:03,103 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:154) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:52:37,626 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.<init>(MysqlDAO.java:46) - java.sql.SQLException: The server time zone value '�й���׼ʱ��' is unrecognized or represents more than one time zone. You must configure either the server or JDBC driver (via the serverTimezone configuration property) to use a more specifc time zone value if you want to utilize time zone support.
+2017-04-07 19:53:11,072 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:154) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:54:21,946 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:154) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:55:24,021 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:154) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:56:54,257 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:57:01,668 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:57:13,089 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 19:58:07,245 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 20:00:14,960 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 20:00:41,190 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 20:03:06,996 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 20:03:43,512 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:155) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists
+2017-04-07 20:04:59,724 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.execute(MysqlDAO.java:154) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'student5k' already exists

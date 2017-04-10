@@ -1,0 +1,770 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+<title>TempMT_Index</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<meta http-equiv="expires" content="31 Dec 2016">
+<meta http-equiv="refresh" content="">
+<meta http-equiv="set-cookie" content="">
+<meta name="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="poolsnowhui">
+<meta name="description" content="基于多线程的时态数据查询研究与实现">
+<!-- CSS BEGIN-->
+<!--[if lt IE 7]>
+<link href="css/fontello-ie7.css" type="text/css" rel="stylesheet">  
+<![endif]-->
+<!-- Google Web fonts -->
+<link href='http://fonts.googleapis.com/css?family=Quattrocento:400,700'
+	rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Patua+One'
+	rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans'
+	rel='stylesheet' type='text/css'>
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/fontello.css" type="text/css" rel="stylesheet">
+<link href="css/table.css" type="text/css" rel="stylesheet">
+<link href="css/prettyPhoto.css" rel='stylesheet' id='prettyphoto-css'
+	type='text/css' media='all'>
+<!-- Page -->
+<link href="css/page.css" rel="stylesheet" type="text/css" />
+<!-- CSS END -->
+
+<!-- Favicon -->
+<link rel="shortcut icon" href="img/favicon.ico">
+
+<style>
+body {
+	padding-top: 60px;
+	/* 60px to make the container go all the way to the bottom of the topbar */
+}
+</style>
+
+<!-- JS BEGIN-->
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- JQuery -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<!-- Load ScrollTo -->
+<script type="text/javascript" src="js/jquery.scrollTo-1.4.2-min.js"></script>
+<!-- Load LocalScroll -->
+<script type="text/javascript" src="js/jquery.localscroll-1.2.7-min.js"></script>
+<script type="text/javascript" src="js/jquery.prettyPhoto.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+
+<script type="text/javascript" src="js/site.js"></script>
+<script type="text/javascript" src="js/page.js"></script>
+
+<!-- 异步更新 -->
+<script type="text/javascript" src="js/myajax.js"></script>
+<!-- JS END-->
+</head>
+<body>
+	<!--******************** NAVBAR ********************-->
+	<div class="navbar-wrapper">
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="navbar-inner"
+				style="background-color: rgba(67, 74, 154, 0.7); border-width: 0.1em; border-color: #c7c7c7;">
+				<div class="container">
+					<!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
+					<a class="btn btn-navbar" data-toggle="collapse"
+						data-target=".nav-collapse"> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+					</a>
+					<h1 class="brand">
+						<img alt="TempMT_Index" width="60px" height="60px" src="img/logo.png" />
+						<a href="#top">TempMT_Index</a>
+					</h1>
+					<!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
+					<nav class="pull-right nav-collapse collapse">
+						<ul id="menu-main" class="nav">
+							<li><a title="select" href="#top">查询</a></li>
+							<li><a title="database" href="#database">数据库</a></li>
+							<li><a title="languages" href="#languages">语言</a></li>
+							<li><a title="help" href="#help">帮助与下载</a></li>
+							<li><a title="team" href="#team">我们的团队</a></li>
+							<!-- <li><a title="contact" href="#contact">联系我们</a></li> -->
+							<!-- <li><a title="download" href="#download">下载专区</a></li> -->
+						</ul>
+					</nav>
+				</div>
+				<!-- /.container -->
+			</div>
+			<!-- /.navbar-inner -->
+		</div>
+		<!-- /.navbar -->
+	</div>
+	<!-- /.navbar-wrapper -->
+	<div id="top"></div>
+	<!-- ******************** HeaderWrap ********************-->
+	<div id="headerwrap">
+		<header class="clearfix">
+			<h1>
+				<img alt="TempMT_Index" width="120px" height="120px" src="img/logo.png" />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>TempMT_Index</span>
+
+			</h1>
+			<h3>
+				<span style="color: #fea; background-color: #333;">在这里输入ATSQL语句，详细语法请查看帮助文档</span>
+			</h3>
+			<div class="container">
+				<div class="row">
+					<textarea name="atsql" id="atsql" placeholder="ATSQL语句"
+						class="cform-text" rows="4" title="atsql"
+						style="border-width: 0.2em; margin-bottom: auto;"
+						onfocus="changeBorderColor();">VALIDTIME PERIOD [ DATE '2013-1-1' - DATE '2014-7-1' ] SELECT * FROM student WHERE course_id = 100070;</textarea>
+				</div>
+				<div class="row" style="height: auto;">
+					<div
+						style="background: #333; border: 0px solid #cccccc; float: left; margin: 4px; padding: 2px; text-align: center; height: 100px;">
+						<label style="width: 200px; color: #fff;">使用内置语句</label> <select
+							id="indexselect" style="width: 200px" id="sql"
+							onchange="defaultSQL(this.value);">
+							<option
+								value="VALIDTIME PERIOD [ DATE '2013-1-1' - DATE '2014-7-1' ] SELECT * FROM student WHERE course_id = 100070;">/语句1.时态选择-期间包含-支持索引/</option>
+							<option value="VALIDTIME PROJECTION SELECT  * FROM student;">/语句2.时态投影/</option>
+							<option
+								value="VALIDTIME SELECT * FROM student,course WHERE course_id = cid;">/语句3.时态连接）/</option>
+							<option value="VALIDTIME SELECT * FROM student;">/语句4.时态全表查/</option>
+							<option value="VALIDTIME SNAPSHOT SELECT * FROM student;">/语句5.快照查询/</option>
+							<option
+								value="VALIDTIME INTERVAL year &gt; 24 SELECT * FROM student;">/语句6.时间选择-跨度/</option>
+							<option
+								value="CREATE TABLE temp(id INT,name varchar(255),email varchar(255),course_id varchar(20))AS VALIDTIME;">/语句7.时态表创建/</option>
+							<option
+								value="VALIDTIME PERIOD [ DATE '2014-09-01' - DATE '2017-07-01' ] INSERT INTO student VALUES ( '67' ,'Chi Xuehui','qazcxh@163.com','100070') ;">/语句8.时态表插入/</option>
+							<option
+								value="VALIDTIME PERIOD [ DATE '2013-1-1' - DATE '2014-7-1' ] SELECT * FROM student ;">/语句9.时态选择-期间包含-磁盘/</option>
+
+
+						</select>
+						<div style="clear: left;">
+							<a style="color: #cccccc;" href="#help">更多语句</a>
+						</div>
+					</div>
+					<div
+						style="background: #333; border: 0px solid #cccccc; float: left; margin: 4px; padding: 2px; text-align: center; height: 100px;">
+						<label style="width: 200px; color: #fff;">索引类型</label> <select
+							style="width: 200px" id="lob"
+							onChange="isDiskCreateLob(this.value);">
+							<option value="0">常规</option>
+							<option value="8">LOB索引内部遍历</option>
+							<option value="9">LOB索引内部二分</option>
+							<option value="10">LOB索引起始序列（暂未开发）</option>
+							<option value="12">多线程（连续）</option>
+							<option value="13">多线程（交叉）</option>
+							<option value="14">多线程（前部连续）</option>
+							<option value="15">多线程（前部交叉）</option>
+						</select>
+						<div style="clear: left;">
+							<input type="button" style="border: 1px solid #cdc;"
+								value="所选索引详情" onclick="indexMore();" />
+							<!--<div style="clear: left;"></div>
+								<a style="color: #cccccc;" href="#result" id="diskCreateLob"
+									hidden=true;>在磁盘中建立LOB索引</a>-->
+						</div>
+					</div>
+					<div
+						style="background: #333; border: 0px solid #cccccc; float: left; margin: 4px; padding: 2px; text-align: center; height: 100px;">
+						<label style="width: 200px; color: #fff;">保留索引</label> <select
+							style="width: 200px" id="isFromDisk">
+							<option value="0">不来自磁盘</option>
+							<option value="1">磁盘</option>
+						</select>
+						<div style="clear: left;">
+							<a style="color: #cccccc;" href="#result" id="diskCreateLob">在磁盘中建立LOB索引</a>
+						</div>
+					</div>
+					<div
+						style="float: left; margin: 4px; padding: 2px; text-align: center;">
+						<a href="#result"><input type="submit" name="queryatsql"
+							id="queryatsql" value="执行" class="cform-submit"
+							style="background: #6699ff !important;" /></a>
+					</div>
+				</div>
+
+				<div class="row">
+					<!-- <div class="span12"> -->
+					<ul class="icon">
+						<li><i><a href="http://www.scholat.com" title="学者网"
+								target="_blank"><img style="width: 64px; height: 64px;"
+									src="img/xuezhewanglogo.png" /></a></i></li>
+						<li><i><a href="http://cs.scnu.edu.cn/"
+								title="华南师范大学计算机学院" target="_blank"><img
+									style="width: 64px; height: 64px;" src="img/hslogo.png" /></a></i></li>
+						<li><a class="jiathis_button_weixin" target="_blank"><i><img
+									style="width: 64px; height: 64px;"
+									src="img/icon64_appwx_logo.png" /></i></a></li>
+						<li><i><a id="weibofenxiang" href=""
+								onclick="weiboShare();" target="_blank" title="分享到微博"><img
+									style="width: 64px; height: 64px;" src="img/LOGO_64x64.png" /></a></i></li>
+					</ul>
+					<!-- </div> -->
+				</div>
+			</div>
+		</header>
+	</div>
+
+	<!--******************** Feature ********************-->
+	<section id="result" class="single-page scrollblock">
+		<div class="inside" style="width: 800px; height: auto; margin: auto;">
+			<hgroup>
+				<h2>atsql执行提示信息</h2>
+			</hgroup>
+			<div class="entry-content">
+				<div id="prompt">
+					<p>当前ATSQL语句：</p>
+					<label>未执行</label>
+					<p>当前转化后的SQL语句：</p>
+					<label></label>
+					<p>当前记录数：</p>
+					<label></label>
+					<p>当前时间开销：</p>
+					<label></label>
+					<p>当前语句类型：</p>
+					<label></label>
+					<p>当前索引策略：</p>
+					<label></label>
+					<p>当前错误信息：</p>
+					<label style="color: #ff0000"></label>
+				</div>
+				<a class="more-link" href="#">查看项目</a>
+			</div>
+
+			<h2>查询结果显示区</h2>
+			<div id="myAllTableDiv"
+				style="width: 800px; height: auto; border: 1px solid #000; margin: auto auto auto auto;">
+				<table id="cs_table" class="datatable"></table>
+			</div>
+
+		</div>
+	</section>
+	<hr>
+	<!--******************** Database Section ********************-->
+	<section id="database" class="single-page scrollblock">
+		<div class="container">
+			<!-- <div class="align"><i class="icon-desktop-circled"></i></div> -->
+			<div class="align">
+				<img alt="database" src="img/database.png" width="50px"
+					height="50px">
+			</div>
+			<h1 id="folio-headline">数据库</h1>
+			<div class="row">
+				<div class="span4">
+					<!-- 列表缩入-->
+					<div class="sidebarmenu">
+						<details>
+							<summary class="blackBackground"
+								style="background: #111; color: #fff; display: block; position: relative; width: 185px; height: 31px; margin: 0 0 5px 0; line-height: 31px; padding: 0px 0 0 10px; text-decoration: none;">数据实例表
+							</summary>
+							<div class="submenu">
+								<ul id="currentDBList" style="list-style: none;">
+									<li id="currentPerList"><a
+										style="display: block; width: 185px; color: black; text-decoration: underline; padding: 5px 0; padding-left: 10px; background: #cccccc; color: #0e4354;"
+										href="">New...</a></li>
+									<li></li>
+								</ul>
+							</div>
+						</details>
+
+					</div>
+					<!-- /.inside -->
+				</div>
+				<!-- /.span4 -->
+				<div class="span4">
+					<div class="mask2">
+						<a href="img/portfolio-02.jpg" rel="prettyPhoto"><img
+							src="img/portfolio-02.jpg" alt=""></a>
+					</div>
+					<div class="inside">
+						<hgroup>
+							<h2>流程图</h2>
+						</hgroup>
+						<div class="entry-content">
+							<p>&hellip;&hellip;&hellip;&hellip;&hellip;</p>
+							<a class="more-link" href="#">查看项目</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</div>
+				<!-- /.span4 -->
+				<div class="span4">
+					<div class="mask2">
+						<a href="img/portfolio-03.jpg" rel="prettyPhoto"><img
+							src="img/portfolio-03.jpg" alt=""></a>
+					</div>
+					<div class="inside">
+						<hgroup>
+							<h2>数据库实例结构</h2>
+						</hgroup>
+						<div class="entry-content">
+							<p>&hellip;&hellip;&hellip;&hellip;&hellip;</p>
+							<a class="more-link" href="#">查看项目</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</div>
+				<!-- /.span4 -->
+			</div>
+			<!-- /.row -->
+
+			<div class="row"></div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container -->
+	</section>
+	<hr>
+	<!--******************** Services Section ********************-->
+	<section id="languages" class="single-page scrollblock">
+		<div class="container">
+			<!-- <div class="align"><i class="icon-cog-circled"></i></div> -->
+			<div class="align">
+				<img alt="language" src="img/language.png" width="50px"
+					height="50px"></img>
+			</div>
+			<h1>语言</h1>
+			<!-- Four columns -->
+			<div class="row">
+				<div class="span3">
+					<!-- <div class="align"> <i class="icon-desktop sev_icon"></i> </div> -->
+					<h2>简体中文</h2>
+					<p>欢迎来到TempMT_Index！</p>
+				</div>
+				<!-- /.span3 -->
+				<div class="span3">
+					<!-- <div class="align"> <i class="icon-vector sev_icon"></i> </div> -->
+					<h2>繁体中文(暂未上线)</h2>
+					<p>歡迎來到TempMT_Index！</p>
+				</div>
+				<!-- /.span3 -->
+				<div class="span3">
+					<!-- <div class="align"> <i class="icon-basket sev_icon"></i> </div> -->
+					<h2>英语(暂未上线)</h2>
+					<p>Welcome to TempMT_Index!</p>
+				</div>
+				<!-- /.span3 -->
+				<div class="span3">
+					<!-- <div class="align"> <i class="icon-mobile-1 sev_icon"></i> </div> -->
+					<h2>粤语(暂未上线)</h2>
+					<p>欢迎嚟TempMT_Index！</p>
+				</div>
+				<!-- /.span3 -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container -->
+	</section>
+	<hr>
+	<!--******************** Testimonials Section ********************-->
+	<section id="testimonials" style="background-color: #6699ff;"
+		class="single-page hidden-phone">
+		<div class="container">
+			<div class="row">
+				<div class="blockquote-wrapper">
+					<blockquote class="mega">
+						<div class="span4">
+							<p class="cite">叶老师:</p>
+						</div>
+						<div class="span8">
+							<p class="alignright">"做的事情并不难，但需要花时间去做。"</p>
+						</div>
+					</blockquote>
+				</div>
+				<!-- /.blockquote-wrapper -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container -->
+	</section>
+	<hr>
+	<!--******************** News Section ********************-->
+	<section id="help" class="single-page scrollblock">
+		<div class="container">
+			<div class="align">
+				<i class="icon-pencil-circled"></i>
+			</div>
+			<h1>帮助与下载</h1>
+			<!-- Three columns -->
+			<div class="row">
+				<article class="span4 post">
+					<img class="img-news" src="img/blog_img-01.jpg" alt="">
+					<div class="inside">
+						<p class="post-date">
+							<i class="icon-calendar"></i> 2016年1月17日
+						</p>
+						<h2>不带时间查询</h2>
+						<div class="entry-content">
+							<p>功能 ATSQL创建数据库 create table chufang4(id int primary
+								key,name varchar(100) not null,mename varchar(100) not
+								null);&hellip;</p>
+							<a href="help/queryGeneral.pdf" target="_blank" class="more-link">阅读全文</a>&nbsp;
+							<a href="help/不带时间查询.doc" target="_blank" class="more-link">下载全文</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</article>
+				<!-- /.span4 -->
+				<article class="span4 post">
+					<img class="img-news" src="img/blog_img-02.jpg" alt="">
+					<div class="inside">
+						<p class="post-date">2016年1月17日</p>
+						<h2>基于时间查询</h2>
+						<div class="entry-content">
+							<p>功能 ATSQL创建数据库 create table chufang(id int,name
+								varchar(100),mename varchar(100))as validtime;时态查询 validtime
+								select * from student; validtime select * from &hellip;</p>
+							<a href="help/queryWithTime.pdf" class="more-link"
+								target="_blank">阅读全文</a>&nbsp; <a href="help/基于时间查询.doc"
+								target="_blank" class="more-link">下载全文</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</article>
+				<!-- /.span4 -->
+				<article class="span4 post">
+					<img class="img-news" src="img/blog_img-03.jpg" alt="">
+					<div class="inside">
+						<p class="post-date">2016年1月17日</p>
+						<h2>TempDB 2.2使用手册</h2>
+						<div class="entry-content">
+							<p>SQL主要分成四部分：DDL（数据定义）：用于定义SQL模式、基本表、视图和索引的创建和 撤消操作。CREATE
+								ALTER DROP TRUNCATE COMMENTRENAMEDML（数据操纵）：&hellip;</p>
+							<a href="help/tempDB_manual.pdf" target="_blank"
+								class="more-link">阅读全文</a>&nbsp; <a
+								href="help/tempDB_manual.doc" target="_blank" class="more-link">下载全文</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</article>
+				<!-- /.span4 -->
+				<article class="span4 post">
+					<img class="img-news" src="img/blog_img-01.jpg" alt="">
+					<div class="inside">
+						<p class="post-date">2016年1月17日</p>
+						<h2>ATSQL介绍</h2>
+						<div class="entry-content">
+							<p>1、时态关系的创建按照时态特性不同， TSQL2 中相应的时态关系分为如下四种类型。① 快
+								照时态关系，无显式的间标签即为常规表。② 有效时间态关系。分为“状”和事件两种情形&hellip;</p>
+							<a href="help/ATSQL_intro.pdf" target="_blank" class="more-link">阅读全文</a>&nbsp;
+							<a href="help/ATSQL_intro.pdf" target="_blank" class="more-link">
+								下载全文</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</article>
+				<!-- /.span4 -->
+				<article class="span4 post">
+					<img class="img-news" src="img/blog_img-02.jpg" alt="">
+					<div class="inside">
+						<p class="post-date">2016年1月17日</p>
+						<h2>TempDB 2.01下载使用</h2>
+						<div class="entry-content">
+							<p>1、安装1．1 环境需求OS: windows 32位操作系统（包含服务器版本）JAVA运行环境，JDK
+								1.5以上MYSQL 5.0 或以上支持TCP/IP 协议1.2 安装TempDB1.2.1 预备安装&hellip;</p>
+							<a href="help/TempDB(old)manual.pdf" target="_blank"
+								class="more-link">阅读全文</a>&nbsp; <a href="help/TempDB.rar"
+								target="_blank" class="more-link"> 下载全文</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</article>
+				<!-- /.span4 -->
+				<article class="span4 post">
+					<img class="img-news" src="img/blog_img-03.jpg" alt="">
+					<div class="inside">
+						<p class="post-date">2016年1月17日</p>
+						<h2>实验实例数据库</h2>
+						<div class="entry-content">
+							<p>&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;
+								&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;
+								&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</p>
+							<a href="help/test.sql" target="_blank" class="more-link">阅读全文</a>&nbsp;
+							<a href="help/test.sql" target="_blank" class="more-link">下载全文</a>
+						</div>
+					</div>
+					<!-- /.inside -->
+				</article>
+				<!-- /.span4 -->
+
+			</div>
+			<!-- /.row -->
+			<a href="#" class="btn btn-large">返回查询</a>
+		</div>
+		<!-- /.container -->
+	</section>
+	<hr>
+	<!--******************** Team Section ********************-->
+	<section id="team" class="single-page scrollblock">
+		<div class="container">
+			<div class="align">
+				<i class="icon-group-circled"></i>
+			</div>
+			<h1>团队信息</h1>
+			<!-- Seven columns -->
+			<div class="row">
+				<div class="span2 offset2">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-1.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/mcsyxp" target="_blank">叶小平</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							教授，博士生导师 <br />华南师范大学 <br />计算机学院 <br />领域： <a
+								title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=时态数据库">时态数据库</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=NoSQL 数据库技术">NoSQL
+								数据库技术</a> / <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=计算机病毒">计算机病毒</a>
+							<br />
+						</p>
+					</div>
+				</div>
+				<!-- ./span2 -->
+				<div class="span2 ">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-3.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/ytang" target="_blank">汤庸</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							教授、博士导师 <br />华南师范大学 <br />计算机学院 <br />领域： <a title="点击搜索领域文献"
+								target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=社交网络与大数据应用 ">社交网络与大数据应用
+							</a> / <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=信息搜索与可信云服务 ">信息搜索与可信云服务
+							</a> / <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=时态数据与知识工程">时态数据与知识工程</a>
+							/... <br />
+						</p>
+					</div>
+				</div>
+				<!-- ./span2 -->
+				<div class="span2 ">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-2.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/namelh" target="_blank">刘海</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							副教授 <br />华南师范大学 <br />计算机学院 <br />领域： <a title="点击搜索领域文献"
+								target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=语义WEB描述逻辑">语义WEB(描述逻辑)</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=数据挖掘机器学习">数据挖掘(机器学习)</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=个性化推荐">个性化推荐</a>
+							<br />
+						</p>
+					</div>
+				</div>
+				<!-- ./span2 -->
+				<div class="span2 ">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-4.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/huashijike288" target="_blank">潘明明</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							硕士生 <br />华南师范大学 <br />计算机学院 <br />领域： <a title="点击搜索领域文献"
+								target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=时态数据库">时态数据库</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=数据库">数据库</a>
+							/ <br />
+						</p>
+					</div>
+				</div>
+			</div>
+			<!-- /.row -->
+			<div class="row">
+				<div class="span2 offset2">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-5.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/qq783175223" target="_blank">徐植君</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							硕士生 <br />华南师范大学 <br />计算机学院 <br />领域： <a title="点击搜索领域文献"
+								target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=时态数据库">时态数据库</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=NoSQL数据库技术">NoSQL数据库技术</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=计算机病毒">计算机病毒</a>
+							<br />
+						</p>
+					</div>
+				</div>
+				<!-- ./span2 -->
+				<div class="span2 ">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-6.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/poolsnowhui" target="_blank">池雪辉</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							硕士生 <br />华南师范大学 <br />计算机学院 <br />领域： <a title="点击搜索领域文献"
+								target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=时态数据库">时态数据库</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=NoSQL数据库技术">NoSQL数据库技术</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=计算机病毒">计算机病毒</a>
+							<br />
+						</p>
+					</div>
+				</div>
+				<!-- ./span2 -->
+				<div class="span2 ">
+					<div class="teamalign">
+						<img class="team-thumb img-circle" src="img/portrait-7.jpg" alt="">
+					</div>
+					<h3>
+						<a href="http://www.scholat.com/dumenhy" target="_blank">杜梦圆</a>
+					</h3>
+					<div class="job-position">
+						<p>
+							硕士生 <br />华南师范大学 <br />计算机学院 <br />领域： <a title="点击搜索领域文献"
+								target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=数据库">数据库</a>
+							/ <a title="点击搜索领域文献" target="_blank"
+								href="http://www.scholat.com/search/papersearch.jsp?q=xml数据库">xml数据库</a>
+							/ <br />
+						</p>
+					</div>
+				</div>
+				<!-- ./span2 -->
+			</div>
+			<!-- /.row -->
+			<div class="row">
+				<div class="span10 offset1">
+					<hr class="featurette-divider">
+					<div class="featurette">
+						<h2 class="featurette-heading">
+							TempMT_Index<span class="muted">| 时态数据管理系统</span>
+						</h2>
+						<p id="abstract1">为了适应时态数据库发展需求,针对目前时态数据库技术实现则相对滞后现状,设计和实现了时态数据处理原型系统TempMT_Index.</p>
+						<p id="abstract2">TempMT_Index采用中间件的架构实现,使用具有代表性的时态查询语言——ATSQL2,将时态操作语言转换成与之语义等价的、标准的SQL语言,然后在后台DBMS上执行,实现了基本的时态数据管理功能.</p>
+						<p id="abstract3">TempMT_Index总结应用了相关理论知识,同时也为时态数据库系统的产品化积累了经验.</p>
+					</div>
+					<!-- /.featurette -->
+					<hr class="featurette-divider">
+				</div>
+				<!-- .span10 -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container -->
+	</section>
+	<hr />
+	<!-- ***********************FOOT**************************** -->
+	<div class="footer-wrapper">
+		<div class="container">
+			<footer>
+				<small>&copy; 2015 TempMT_Index 实验室. All rights reserved.</small>
+			</footer>
+		</div>
+		<!-- ./container -->
+	</div>
+
+	<!-- Loading the javaScript at the end of the page -->
+
+<!-- 	<script type="text/javascript"
+		src="http://v3.jiathis.com/code/jia.js?uid=1" charset="utf-8">
+		//微信分享
+	</script> -->
+
+	<script type="text/javascript">
+		//微博分享
+		function weiboShare() {
+			var weibourl = "http://service.weibo.com/share/share.php?title="
+					+ document.title + ","
+					+ document.getElementById("abstract1").innerHTML + " "
+					+ document.getElementById("abstract2").innerHTML + " "
+					+ document.getElementById("abstract3").innerHTML + "&url="
+					+ document.URL + "&pic=img/logo.png";
+			document.getElementById("weibofenxiang").href = weibourl;
+		}
+		//获取默认SQL
+		function defaultSQL(sql) {
+			document.getElementById("atsql").innerHTML = sql;
+		}
+		//更多索引详情
+		function indexMore() {
+			var indexType = document.getElementById("lob").value;
+			var indexHtml = "help\/index" + indexType + ".html";
+			window.open(indexHtml);
+		}
+		//选中搜索框时改变边框颜色
+		function changeBorderColor() {
+			var atsql = document.getElementById("atsl");
+			atsql.setAttribute("style", "border-color:#3a87ad");
+		};
+	</script>
+	<script type="text/javascript">
+		//data
+		var data = [];
+		for (var i = 0; i < 334; i++) {
+			data[i] = {
+				id : i + 1,
+				name : "jason" + (i + 1),
+				gender : "男",
+				age : 26,
+				address : "成都"
+			};
+		}
+		var cs = new table({
+			"tableId" : "cs_table", //必须
+			"headers" : [ "序号", "姓名", "性别", "年龄", "地址" ], //必须
+			"data" : data, //必须
+			"displayNum" : 10, //必须   默认 10
+			"groupDataNum" : 10
+		//可选    默认 10
+		});
+	</script>
+	<!-- 	<!--ANALYTICS CODE-->
+	<script type="text/javascript">
+		/* 		var _gaq = _gaq || [];
+		 _gaq.push([ '_setAccount', 'UA-29231762-1' ]);
+		 _gaq.push([ '_setDomainName', 'TempMT_Index.com' ]);
+		 _gaq.push([ '_trackPageview' ]);
+
+		 (function() {
+		 var ga = document.createElement('script');
+		 ga.type = 'text/javascript';
+		 ga.async = true;
+		 ga.src = ('https:' == document.location.protocol ? 'https://ssl'
+		 : 'http://www')
+		 + '.google-analytics.com/ga.js';
+		 var s = document.getElementsByTagName('script')[0];
+		 s.parentNode.insertBefore(ga, s);
+		 })(); */
+	</script>
+
+	<!-- prettyPhoto Initialization -->
+	<!-- 	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function() {
+			$("a[rel^='prettyPhoto']").prettyPhoto();
+		});
+	</script> -->
+</body>
+</html>
