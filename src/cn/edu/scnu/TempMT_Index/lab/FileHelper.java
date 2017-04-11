@@ -1,13 +1,21 @@
 package cn.edu.scnu.TempMT_Index.lab;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
+
+import org.apache.log4j.Logger;
 
 import cn.edu.scnu.TempMT_Index.service.CONTANT;
+import demo.FileScanner;
 
 /**
  * 文件单例模式
@@ -56,7 +64,31 @@ public class FileHelper {
 		}
 	}
 
-	public  String read(String fileName) {
+	public void writeBinary(String fileName, String data) {
+		// 写文件
+		DataOutputStream dos = null;
+		try {
+			File file = new File(dirName, fileName);
+			file.getParentFile().mkdirs();// 建目录
+			FileOutputStream fos = new FileOutputStream(file);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			dos = new DataOutputStream(bos);
+			dos.writeBytes(data);
+		} catch (IOException e) {
+			Logger.getLogger(FileHelper.class).error(e);
+			e.printStackTrace();
+		} finally {
+			if (dos != null) {
+				try {
+					dos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public String read(String fileName) {
 		// 读文件
 		File file = new File(dirName, fileName);
 		String data = "";
@@ -81,6 +113,37 @@ public class FileHelper {
 			throw new RuntimeException("目录" + dirName + "中的" + fileName + "文件不存在");
 		}
 		return data;
+	}
+
+	public static void scan(String path) {
+		FileInputStream inputStream = null;
+		Scanner sc = null;
+		try {
+			inputStream = new FileInputStream(path);
+			sc = new Scanner(inputStream, "UTF-8");
+			while (sc.hasNextLine()) {
+				String line = sc.nextLine();
+				System.out.println(line);
+			}
+			// note that Scanner suppresses exceptions
+			if (sc.ioException() != null) {
+				throw sc.ioException();
+			}
+		} catch (IOException e) {
+			Logger.getLogger(FileScanner.class.getName()).error(e);
+			e.printStackTrace();
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (sc != null) {
+				sc.close();
+			}
+		}
 	}
 
 	private void close() {
@@ -111,9 +174,23 @@ public class FileHelper {
 		}
 	}
 
+	/**
+	 * @param dirName
+	 *            the dirName to set
+	 */
+	public void setDirName(String dirName) {
+		FileHelper.dirName = dirName;
+	}
+
 	public static void main(String[] args) {
 		FileHelper fh = FileHelper.getInstance();
-		fh.write("test", "abcderf什么鬼" + "\n" + "dsfaasdf");
-		System.out.println(fh.read("test"));
+		fh.setDirName(CONTANT.rootPath);
+		String s = "";
+		for (int i = 0; i < Math.pow(2, 15); i++) {
+			s += "test123" + i + "\n";
+		}
+		fh.writeBinary("1.dat", s);
+		fh.setDirName(CONTANT.rootPath + "\\lab");
+		System.out.println("finished");
 	}
 }
