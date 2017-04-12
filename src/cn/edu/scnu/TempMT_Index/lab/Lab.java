@@ -104,7 +104,7 @@ public class Lab {
 		FileHelper fh = FileHelper.getInstance();
 		for (int i = 0; i < dataCount.length; i++) {
 			int sum = 0;
-			int copy = 500;
+			int copy = 50;
 			for (int j = 0; j < copy; j++) {
 				String sql = "VALIDTIME PROJECTION SELECT  * FROM student" + (dataCount[i] / 1000) + "k;";
 				DQL project = new DQL();
@@ -124,7 +124,7 @@ public class Lab {
 		FileHelper fh = FileHelper.getInstance();
 		for (int i = 0; i < dataCount.length; i++) {
 			int sum = 0;
-			int copy = 500;
+			int copy = 50;
 			for (int j = 0; j < copy; j++) {
 				String sql = "VALIDTIME INTERVAL year > 24 SELECT * FROM student" + (dataCount[i] / 1000) + "k;";
 				DQL interval = new DQL();
@@ -144,7 +144,7 @@ public class Lab {
 		FileHelper fh = FileHelper.getInstance();
 		for (int i = 0; i < dataCount.length; i++) {
 			int sum = 0;
-			int copy = 500;
+			int copy = 50;
 			for (int j = 0; j < copy; j++) {
 				String sql = "VALIDTIME SNAPSHOT SELECT * FROM student" + (dataCount[i] / 1000) + "k;";
 				DQL snap = new DQL();
@@ -164,7 +164,7 @@ public class Lab {
 		FileHelper fh = FileHelper.getInstance();
 		for (int i = 0; i < dataCount.length; i++) {
 			int sum = 0;
-			int copy = 500;
+			int copy = 50;
 			for (int j = 0; j < copy; j++) {
 				String sql = "VALIDTIME PERIOD [ DATE '2013-1-1' - DATE '2016-1-1' ] SELECT * FROM student"
 						+ (dataCount[i] / 1000) + "k;";
@@ -181,15 +181,15 @@ public class Lab {
 
 	public static void main(String[] args) {
 		int c = 20000;
-		for (int i = 46; i < 50; i++) {
-//			labInterval(i * c + c);
-//			System.out.println("labInterval " + (i * c + c));
-//			labPeriod(0, i * c + c);
-//			System.out.println("labPeriod " + (i * c + c));
-			labProjection(i * c + c);
-			System.out.println("labProjection " + (i * c + c));
-//			labSnap(i * c + c);
-//			System.out.println("labSnap " + (i * c + c));
+		for (int i = 39; i < 50; i++) {
+			labInterval(i * c + c);
+			System.out.println("labInterval " + (i * c + c));
+			labPeriod(0, i * c + c);
+			System.out.println("labPeriod " + (i * c + c));
+//			labProjection(i * c + c);
+//			System.out.println("labProjection " + (i * c + c));
+			labSnap(i * c + c);
+			System.out.println("labSnap " + (i * c + c));
 		}
 	}
 }

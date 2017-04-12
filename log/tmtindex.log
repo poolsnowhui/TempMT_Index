@@ -1,1 +1,1 @@
-2017-04-10 20:43:23,819 [ERROR] demo.FileScanner.scan(FileScanner.java:38) - java.io.FileNotFoundException: D:\Users\CXH\Documents\java\workspaceWithJ2EE\TempMT_Index1.dat (系统找不到指定的文件。)
+2017-04-11 20:32:43,245 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.executeQuery(MysqlDAO.java:125) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'tmtindex.student800k' doesn't exist

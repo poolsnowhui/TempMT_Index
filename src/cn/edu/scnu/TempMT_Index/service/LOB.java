@@ -1,6 +1,8 @@
 package cn.edu.scnu.TempMT_Index.service;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import org.apache.log4j.Logger;
 
 import cn.edu.scnu.TempMT_Index.dao.DAOFactory;
 import cn.edu.scnu.TempMT_Index.lab.FileHelper;
@@ -804,37 +808,74 @@ public class LOB {
 		// String lobindex = System.getProperty("user.dir") +
 		// "\\WebRoot\\lobindex";// 存盘路径
 		System.out.println("索引磁盘路径" + indexFolder);
-		File f = new File(indexFolder, tableName + ".idx");
-		f.getParentFile().mkdirs();
-		FileOutputStream fos = null;
+		// 写文件
+		DataOutputStream dos = null;
 		try {
-			f.createNewFile();
-			fos = new FileOutputStream(f);
-			String temp = "";
-			byte[] bytes;
+			File file = new File(indexFolder, tableName + ".idx");
+			file.getParentFile().mkdirs();// 建目录
+			file.createNewFile();// 建文件
+			FileOutputStream fos = new FileOutputStream(file);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			dos = new DataOutputStream(bos);
+			String data = "";
 			for (int i = 0, len = alalTuple.size(); i < len; i++) {
-				temp = i + "\n";
-				bytes = temp.getBytes();
-				fos.write(bytes);
+				data = i + "\n";
+				dos.writeBytes(data);
 				for (int j = 0, lenj = alalTuple.get(i).size(); j < lenj; j++) {
-					temp = alalTuple.get(i).get(j).toString() + "\n";
-					bytes = temp.getBytes();
-					fos.write(bytes);
-					fos.flush();
+					data = alalTuple.get(i).get(j).toString() + "\n";
+					dos.writeBytes(data);
+					dos.flush();
 				}
 			}
-			System.out.println("存磁盘成功//将索引结果放到" + tableName + ".idx");
+			System.out.println("存磁盘success.索引位置：" + tableName + ".idx");
+			// dos.writeBytes(data);
+
 		} catch (IOException e) {
-			e.printStackTrace();// 控制台输出异常，供开发使用
+			Logger.getLogger(LOB.class).error(e);
+			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
 		} finally {
-			try {
-				fos.close();
-			} catch (IOException e) {
-				e.printStackTrace();// 控制台输出异常，供开发使用
-				throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+			if (dos != null) {
+				try {
+					dos.close();
+				} catch (IOException e) {
+					Logger.getLogger(LOB.class).error(e);
+					e.printStackTrace();
+					throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+				}
 			}
 		}
+		// File f = new File(indexFolder, tableName + ".idx");
+		// f.getParentFile().mkdirs();
+		// FileOutputStream fos = null;
+		// try {
+		// f.createNewFile();
+		// fos = new FileOutputStream(f);
+		// String temp = "";
+		// byte[] bytes;
+		// for (int i = 0, len = alalTuple.size(); i < len; i++) {
+		// temp = i + "\n";
+		// bytes = temp.getBytes();
+		// fos.write(bytes);
+		// for (int j = 0, lenj = alalTuple.get(i).size(); j < lenj; j++) {
+		// temp = alalTuple.get(i).get(j).toString() + "\n";
+		// bytes = temp.getBytes();
+		// fos.write(bytes);
+		// fos.flush();
+		// }
+		// }
+		// System.out.println("存磁盘成功//将索引结果放到" + tableName + ".idx");
+		// } catch (IOException e) {
+		// e.printStackTrace();// 控制台输出异常，供开发使用
+		// throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+		// } finally {
+		// try {
+		// fos.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();// 控制台输出异常，供开发使用
+		// throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+		// }
+		// }
 		return true;
 	}
 

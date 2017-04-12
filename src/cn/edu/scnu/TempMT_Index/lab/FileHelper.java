@@ -64,7 +64,7 @@ public class FileHelper {
 		}
 	}
 
-	public void writeBinary(String fileName, String data) {
+	public void writeBinary(String dirName,String fileName, String data) {
 		// 写文件
 		DataOutputStream dos = null;
 		try {
@@ -183,14 +183,14 @@ public class FileHelper {
 	}
 
 	public static void main(String[] args) {
-		FileHelper fh = FileHelper.getInstance();
-		fh.setDirName(CONTANT.rootPath);
-		String s = "";
-		for (int i = 0; i < Math.pow(2, 15); i++) {
-			s += "test123" + i + "\n";
-		}
-		fh.writeBinary("1.dat", s);
-		fh.setDirName(CONTANT.rootPath + "\\lab");
-		System.out.println("finished");
+//		FileHelper fh = FileHelper.getInstance();
+//		fh.setDirName(CONTANT.rootPath);
+//		String s = "";
+//		for (int i = 0; i < Math.pow(2, 15); i++) {
+//			s += "test123" + i + "\n";
+//		}
+//		fh.writeBinary("1.dat", s);
+//		fh.setDirName(CONTANT.rootPath + "\\lab");
+//		System.out.println("finished");
 	}
 }
