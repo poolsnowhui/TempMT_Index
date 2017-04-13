@@ -7,12 +7,22 @@
  */
 package cn.edu.scnu.TempMT_Index.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @author CXH
  *
  */
 public class FUNCTION {
-
+	/**
+	 * get current date 
+	 * @return
+	 */
+	public static String getCurrDate(){
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		return simpleDateFormat.format(new Date());
+	}
 	/**
 	 * 判断字符串是否是整数
 	 */

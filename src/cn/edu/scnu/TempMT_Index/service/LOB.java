@@ -44,8 +44,8 @@ public class LOB {
 	private int resultNum;// 结果个数
 
 	/**
-	 * 0 SQL查 1 时态索引 0SQL 8单线程 12线程 14前部 10 单线程 11多线程 1001 分支内部遍历
-	 * 1010分支内部二分1011分支起始序列 110实际 111前部 1100连续 1101交叉 1110前部连续 1111前部交叉
+	 * 0 SQL查 1 时态索引 0SQL 8单线程 12线程 14前部 10 单线程 11多线程 1000 分支内部遍历
+	 * 1001分支内部二分1010分支起始序列 110实际 111前部 1100连续 1101交叉 1110前部连续 1111前部交叉
 	 */
 	public LOB() {
 	}
@@ -308,6 +308,56 @@ public class LOB {
 	}
 
 	/**
+	 * 线序分支查询（分支逐个查）
+	 * 
+	 * @param alalTuple
+	 * @param query
+	 * @return
+	 */
+	public List<Tuple> queryTraversal(List<ArrayList<Tuple>> alalTuple, ValidTime query) {
+		long start = System.currentTimeMillis();
+		// 左时间比右时间大时，查询区间有误返回null
+		if (query.getLeft() > query.getRight()) {
+			return null;
+		}
+		// 开始查询
+		ArrayList<Tuple> queryResult = new ArrayList<Tuple>();// 查询结果
+		for (int i = 0; i < alalTuple.size(); i++) {
+			// 索引的分支数，i分支
+			// 1
+			if (alalTuple.get(i).get(0).getVt().getLeft() > query.getLeft()) {
+				// 所有分支都不是，退出查询
+				break;
+			} else {
+				// 2.1
+				if (alalTuple.get(i).get(0).getVt().getRight() < query.getRight()) {
+					// 整条分支都不是，头就不包含
+					continue;
+				} else if (alalTuple.get(i).get(alalTuple.get(i).size() - 1).getVt().getLeft() <= query.getLeft()
+						&& alalTuple.get(i).get(alalTuple.get(i).size() - 1).getVt().getRight() >= query.getRight()) {
+					// 2.2
+					// 尾部区间包含查询区间时，说明整条分支都是。
+					queryResult.addAll(alalTuple.get(i));// 整条分支放入查询结果集中
+					continue;
+				} else {
+					// 2.3
+					// 部分分支是
+					for (int j = 0; j < alalTuple.get(i).size()
+							&& alalTuple.get(i).get(j).getVt().getLeft() <= query.getLeft()
+							&& alalTuple.get(i).get(j).getVt().getRight() >= query.getRight(); j++) {
+						queryResult.add(alalTuple.get(i).get(j));
+					}
+				}
+			}
+	
+		}
+		System.out.println("查询成功！共" + queryResult.size() + "个区间");
+		time[4] = System.currentTimeMillis() - start;
+		return queryResult;
+	
+	}
+
+	/**
 	 * 4.根据索引得结果 线序分支查询（分支使用二分法查找）
 	 * 
 	 * @param resultLOB
@@ -367,21 +417,15 @@ public class LOB {
 		return queryResult;
 	}
 
-	public List<Tuple> querySequence(List<ArrayList<Tuple>> alalTuple, ValidTime query) {
-		// TODO
-		long start = System.currentTimeMillis();
-		time[4] = System.currentTimeMillis() - start;
-		return null;
-	}
-
 	/**
-	 * 线序分支查询（分支逐个查）
+	 * 起始序列二分
 	 * 
 	 * @param alalTuple
 	 * @param query
 	 * @return
 	 */
-	public List<Tuple> queryTraversal(List<ArrayList<Tuple>> alalTuple, ValidTime query) {
+	public List<Tuple> querySequence(List<ArrayList<Tuple>> lop, ValidTime query) {
+		// TODO
 		long start = System.currentTimeMillis();
 		// 左时间比右时间大时，查询区间有误返回null
 		if (query.getLeft() > query.getRight()) {
@@ -389,39 +433,70 @@ public class LOB {
 		}
 		// 开始查询
 		ArrayList<Tuple> queryResult = new ArrayList<Tuple>();// 查询结果
-		for (int i = 0; i < alalTuple.size(); i++) {
+		for (int i = 0; i < lop.size(); i++) {
 			// 索引的分支数，i分支
 			// 1
-			if (alalTuple.get(i).get(0).getVt().getLeft() > query.getLeft()) {
+			if (lop.get(i).get(0).getVt().getLeft() > query.getLeft()) {
 				// 所有分支都不是，退出查询
+				// System.out.println("实际个数"+i);
 				break;
 			} else {
 				// 2.1
-				if (alalTuple.get(i).get(0).getVt().getRight() < query.getRight()) {
+				if (lop.get(i).get(0).getVt().getRight() < query.getRight()) {
 					// 整条分支都不是，头就不包含
 					continue;
-				} else if (alalTuple.get(i).get(alalTuple.get(i).size() - 1).getVt().getLeft() <= query.getLeft()
-						&& alalTuple.get(i).get(alalTuple.get(i).size() - 1).getVt().getRight() >= query.getRight()) {
+				} else if (lop.get(i).get(lop.get(i).size() - 1).getVt().getLeft() <= query.getLeft()
+						&& lop.get(i).get(lop.get(i).size() - 1).getVt().getRight() >= query.getRight()) {
 					// 2.2
 					// 尾部区间包含查询区间时，说明整条分支都是。
-					queryResult.addAll(alalTuple.get(i));// 整条分支放入查询结果集中
+					queryResult.addAll(lop.get(i));// 整条分支放入查询结果集中
 					continue;
 				} else {
 					// 2.3
-					// 部分分支是
-					for (int j = 0; j < alalTuple.get(i).size()
-							&& alalTuple.get(i).get(j).getVt().getLeft() <= query.getLeft()
-							&& alalTuple.get(i).get(j).getVt().getRight() >= query.getRight(); j++) {
-						queryResult.add(alalTuple.get(i).get(j));
+					// 部分分支是（使用二分法查找）
+					// 2.3.1找起点
+					// int xh = 0;
+					int mids = 0;
+					int lows = 0;
+					int highs = lop.get(i).size() - 1;
+					for (; lows < highs;) {
+						mids = (lows + highs) / 2;
+						// System.out.println(++xh + " " + lows + " " + mids + "
+						// " + highs);
+						if (lop.get(i).get(mids).getVt().getLeft() <= query.getLeft()) {
+							lows = mids + 1;
+						} else {
+							highs = mids - 1;
+						}
 					}
+					// 2.3.2找终点
+					// xh = 0;
+					int mide = 0;
+					int lowe = 0;
+					int highe = lop.get(i).size() - 1;
+					for (; lowe < highe;) {
+						mide = (lowe + highe) / 2;
+						// System.out.println(++xh + " " + lowe + " " + mide + "
+						// " + highe);
+						if (lop.get(i).get(mide).getVt().getRight() < query.getRight()) {
+
+							highe = mide - 1;
+						} else {
+							lowe = mide + 1;
+						}
+					}
+					int mid = Math.min(mids, mide);
+					// System.out.println("mid" + mid);
+					for (int j = 0; j < mid; j++) {
+						queryResult.add(lop.get(i).get(j));
+					}
+
 				}
 			}
-
 		}
-		System.out.println("查询成功！共" + queryResult.size() + "个区间");
+		// System.out.println("查询成功！共"+queryResult.size()+"个区间");
 		time[4] = System.currentTimeMillis() - start;
 		return queryResult;
-
 	}
 
 	/**
@@ -755,9 +830,9 @@ public class LOB {
 				resultLOB = create(result1);// 2.建线序分支
 				System.out.println("create");
 				for (int i = 0; i < resultLOB.size(); i++) {
-//					System.out.println(resultLOB.get(i));
+					// System.out.println(resultLOB.get(i));
 					for (int j = 0; j < resultLOB.get(i).size(); j++) {
-//						System.out.println(resultLOB.get(i).get(j));
+						// System.out.println(resultLOB.get(i).get(j));
 					}
 				}
 				// time2 = System.currentTimeMillis() - time1;
@@ -772,7 +847,14 @@ public class LOB {
 			// 1.2调用策略查
 			if ((strategy & 12) != 12) {
 				// 1.2.1不使用线程
-				if (strategy == 9) {
+				if (strategy == 8) {
+
+					// 1.2.1.3分支内遍历查找
+					result5 = queryTraversal(resultLOB, query);
+					// time5 = System.currentTimeMillis() - start - time1 -
+					// time2 - time3 - time4;
+
+				} else if (strategy == 9) {
 					// 1.2.1.1 分支内二分查找
 					result5 = queryBinaryChop(resultLOB, query);
 					// time5 = System.currentTimeMillis() - start - time1 -
@@ -782,13 +864,6 @@ public class LOB {
 					result5 = querySequence(resultLOB, query);
 					// time5 = System.currentTimeMillis() - start - time1 -
 					// time2 - time3 - time4;
-				} else if (strategy == 8) {
-
-					// 1.2.1.3分支内遍历查找
-					result5 = queryTraversal(resultLOB, query);
-					// time5 = System.currentTimeMillis() - start - time1 -
-					// time2 - time3 - time4;
-
 				} else {
 
 				}
@@ -1101,68 +1176,96 @@ public class LOB {
 	public void setThreadCount(int threadCount) {
 		this.threadCount = threadCount;
 	}
-
-	/* 辅助函数 */
-	/*************************************************************/
-
-	public static void queryMain() {
-		String[] tableName = { "student1800k", "student2000k", "student2200k", "student2400k", "student2600k", };
-		String[] queryStr = { "2013-01-01", "2014-07-01" };
-		ValidTime query = new ValidTime(queryStr[0], queryStr[1]);
-		int testTimes = 5;
-		LOB lobQuery0;
-		LOB lobQuery1;
-		LOB lobQuery2;
-		LOB lobQuery3;
-		LOB lobQuery4;
-		for (int i = 0, len = tableName.length; i < len; i++) {
-			lobQuery0 = new LOB(0, "", query, tableName[i], false, 0);
-
-			for (int j = 0; j < testTimes; j++) {
-				lobQuery0.queryNoLOB(tableName[i], query);
-				lobQuery0.getMessage();
-			}
-		}
-		lobQuery0 = null;
-		for (int i = 0, len = tableName.length; i < len; i++) {
-			lobQuery1 = new LOB(8, "", query, tableName[i], false, 0);
-
-			for (int j = 0; j < testTimes; j++) {
-				lobQuery1.queryProcess();
-				lobQuery1.getMessage();
-			}
-		}
-		lobQuery1 = null;
-		for (int i = 0, len = tableName.length; i < len; i++) {
-			lobQuery2 = new LOB(9, "", query, tableName[i], false, 0);
-			for (int j = 0; j < testTimes; j++) {
-				lobQuery2.queryProcess();
-				lobQuery2.getMessage();
-			}
-		}
-		lobQuery2 = null;
-		for (int i = 0, len = tableName.length; i < len; i++) {
-			lobQuery3 = new LOB(8, "", query, tableName[i], true, 0);
-			for (int j = 0; j < testTimes; j++) {
-				lobQuery3.disk012Create();
-				lobQuery3.queryProcess();
-				lobQuery3.getMessage();
-			}
-		}
-		lobQuery3 = null;
-		for (int i = 0, len = tableName.length; i < len; i++) {
-			lobQuery4 = new LOB(9, "", query, tableName[i], true, 0);
-			for (int j = 0; j < testTimes; j++) {
-				lobQuery4.disk012Create();
-				lobQuery4.queryProcess();
-				lobQuery4.getMessage();
-			}
-		}
-		lobQuery4 = null;
-
-	}
+	//
+	// /* 辅助函数 */
+	// /*************************************************************/
+	//
+	// public static void queryMain() {
+	// String[] tableName = { "student1800k", "student2000k", "student2200k",
+	// "student2400k", "student2600k", };
+	// String[] queryStr = { "2013-01-01", "2014-07-01" };
+	// ValidTime query = new ValidTime(queryStr[0], queryStr[1]);
+	// int testTimes = 5;
+	// LOB lobQuery0;
+	// LOB lobQuery1;
+	// LOB lobQuery2;
+	// LOB lobQuery3;
+	// LOB lobQuery4;
+	// for (int i = 0, len = tableName.length; i < len; i++) {
+	// lobQuery0 = new LOB(0, "", query, tableName[i], false, 0);
+	//
+	// for (int j = 0; j < testTimes; j++) {
+	// lobQuery0.queryNoLOB(tableName[i], query);
+	// lobQuery0.getMessage();
+	// }
+	// }
+	// lobQuery0 = null;
+	// for (int i = 0, len = tableName.length; i < len; i++) {
+	// lobQuery1 = new LOB(8, "", query, tableName[i], false, 0);
+	//
+	// for (int j = 0; j < testTimes; j++) {
+	// lobQuery1.queryProcess();
+	// lobQuery1.getMessage();
+	// }
+	// }
+	// lobQuery1 = null;
+	// for (int i = 0, len = tableName.length; i < len; i++) {
+	// lobQuery2 = new LOB(9, "", query, tableName[i], false, 0);
+	// for (int j = 0; j < testTimes; j++) {
+	// lobQuery2.queryProcess();
+	// lobQuery2.getMessage();
+	// }
+	// }
+	// lobQuery2 = null;
+	// for (int i = 0, len = tableName.length; i < len; i++) {
+	// lobQuery3 = new LOB(8, "", query, tableName[i], true, 0);
+	// for (int j = 0; j < testTimes; j++) {
+	// lobQuery3.disk012Create();
+	// lobQuery3.queryProcess();
+	// lobQuery3.getMessage();
+	// }
+	// }
+	// lobQuery3 = null;
+	// for (int i = 0, len = tableName.length; i < len; i++) {
+	// lobQuery4 = new LOB(9, "", query, tableName[i], true, 0);
+	// for (int j = 0; j < testTimes; j++) {
+	// lobQuery4.disk012Create();
+	// lobQuery4.queryProcess();
+	// lobQuery4.getMessage();
+	// }
+	// }
+	// lobQuery4 = null;
+	//
+	// }
 
 	public static void main(String[] args) {
+		List<Tuple> lt = new ArrayList<>();
+		String s = "1,cxh,english";
+		long[][] l = { { 1, 10 }, { 1, 9 }, { 1, 8 }, { 1, 7 }, { 2, 7 }, { 2, 6 }, { 2, 5 }, { 2, 4 }, { 3, 4 },
+				{ 2, 9 }, { 3, 9 }, { 5, 10 }, { 6, 10 }, { 2, 8 }, { 3, 8 }, { 4, 9 }, { 1, 9 }, { 5, 9 }, { 7, 9 },
+				{ 5, 8 }, { 7, 8 }, { 4, 7 }, { 5, 7 }, { 6, 7 }, { 5, 6 }, { 3, 5 }, { 4, 5 } };
+		for (int i = 0; i < l.length; i++) {
+			for (int j = 0; j < l[i].length; j++) {
+				l[i][j] *= 1000;
+			}
+		}
+		for (int i = 0; i < l.length; i++) {
+			Tuple t = new Tuple(s.split(","), l[i]);
+			lt.add(t);
+			System.out.print(t.getNt());
+			System.out.println(t.getLeft() + "," + t.getRight());
+		}
+		// System.out.println(lt);
+		LOB test = new LOB();
+		System.out.println("create...");
+		List<ArrayList<Tuple>> create = test.create(lt);
+		System.out.println("query...");
+		List<Tuple> querySequence = test.queryBinaryChop(create, new ValidTime(4000, 5000));
+		for (int i = 0; i < querySequence.size(); i++) {
+			Tuple r = querySequence.get(i);
+			System.out.print(r.getNt());
+			System.out.println(r.getLeft() + "," + r.getRight());
+		}
 	}
 
 }

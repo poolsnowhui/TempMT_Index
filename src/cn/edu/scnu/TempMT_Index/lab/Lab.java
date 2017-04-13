@@ -1,11 +1,13 @@
 package cn.edu.scnu.TempMT_Index.lab;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import cn.edu.scnu.TempMT_Index.service.DQL;
+import cn.edu.scnu.TempMT_Index.service.FUNCTION;
 import cn.edu.scnu.TempMT_Index.service.LOB;
 import cn.edu.scnu.TempMT_Index.service.ReMessage;
 import cn.edu.scnu.TempMT_Index.service.Tuple;
@@ -50,14 +52,19 @@ public class Lab {
 			ArrayList<Tuple> alTuple = importAndExportDataBase.ExportD();
 			List<ArrayList<Tuple>> result = thread.create(alTuple);
 			for (int j = 0; j < interval.length; j++) {
-				long vtMax = result.get(0).get(0).getRight();
-				long vtMin = result.get(0).get(0).getLeft();
 				ValidTime[] query = new ValidTime[copy];
-				for (int k = 0; k < copy; k++) {// 随机生成repeatCount个查询窗口
-					long qvts = (long) ((vtMax - vtMin) * (1 - interval[j]) * Math.random() + vtMin);
-					long qvte = (long) (qvts + (vtMax - vtMin) * interval[j]);
-					query[k] = new ValidTime(qvts, qvte);
-				} // 500个查询窗口
+				try {
+					long vtMax = new SimpleDateFormat("YY-MM-DD").parse("2030-04-01").getTime();
+					long vtMin = new SimpleDateFormat("YY-MM-DD").parse("1980-04-01").getTime();
+
+					for (int k = 0; k < copy; k++) {// 随机生成repeatCount个查询窗口
+						long qvts = (long) ((vtMax - vtMin) * (1 - interval[j]) * Math.random() + vtMin);
+						long qvte = (long) (qvts + (vtMax - vtMin) * interval[j]);
+						query[k] = new ValidTime(qvts, qvte);
+					} // copy个查询窗口
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 				int sum = 0;
 				String data = "";
 				for (int m = 0; m < strategy.length; m++) {
@@ -118,8 +125,7 @@ public class Lab {
 	}
 
 	public static void labInterval(int... dataCount) {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String format = simpleDateFormat.format(new Date());
+		String format = FUNCTION.getCurrDate();
 		String fileName = "interval_" + format + ".lab";
 		FileHelper fh = FileHelper.getInstance();
 		for (int i = 0; i < dataCount.length; i++) {
@@ -157,46 +163,98 @@ public class Lab {
 		}
 	}
 
+	public static void labDisk(int... dataCount) {
+		LOB disk = new LOB();
+		double[] interval = { 0.1 };
+		int[] strategy = { 9 };
+		String format = FUNCTION.getCurrDate();
+		FileHelper fh = FileHelper.getInstance();
+		for (int i = 0; i < dataCount.length; i++) {
+			String tableName = "student" + (dataCount[i] / 1000) + "k";
+			disk.setFromDisk(true);
+			disk.setTableName(tableName);
+			int copy = 500;
+			for (int j = 0; j < interval.length; j++) {
+				ValidTime[] query = new ValidTime[copy];
+				try {
+					long vtMax = new SimpleDateFormat("YY-MM-DD").parse("2030-04-01").getTime();
+					long vtMin = new SimpleDateFormat("YY-MM-DD").parse("1980-04-01").getTime();
+
+					for (int k = 0; k < copy; k++) {// 随机生成repeatCount个查询窗口
+						long qvts = (long) ((vtMax - vtMin) * (1 - interval[j]) * Math.random() + vtMin);
+						long qvte = (long) (qvts + (vtMax - vtMin) * interval[j]);
+						query[k] = new ValidTime(qvts, qvte);
+					} // copy个查询窗口
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				for (int m = 0; m < strategy.length; m++) {
+					disk.setStrategy(strategy[m]);
+					String fileName = "period(disk)_" + strategy[m] + "_" + format + ".lab";
+					int sum = 0;
+					String data = "";
+					for (int k = 0; k < copy; k++) {
+						disk.setQuery(query[k]);
+						disk.queryProcess();
+						sum += disk.getTime()[3] + disk.getTime()[4];
+					}
+					data += dataCount[i] + " " + interval[j] + " " + " " + strategy[m] + " " + (sum / copy) + "\n";
+					fh.write(fileName, data);
+				}
+			}
+		}
+	}
+
 	public static void labPeriod(int strategy[], int... dataCount) {
 		LOB period = new LOB();
 		double[] interval = { 0.1 };
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String format = simpleDateFormat.format(new Date());
+		String format = FUNCTION.getCurrDate();
 		FileHelper fh = FileHelper.getInstance();
+		List<ArrayList<Tuple>> result = new ArrayList<>();
+		ArrayList<Tuple> alTuple = new ArrayList<>();
+		ImportAndExportDataBase importAndExportDataBase = new ImportAndExportDataBase();
 		for (int i = 0; i < dataCount.length; i++) {
 			// 1.从数据库中来
-			ImportAndExportDataBase importAndExportDataBase = new ImportAndExportDataBase();
+			importAndExportDataBase = new ImportAndExportDataBase();
 			importAndExportDataBase.setDataCount(dataCount[i]);
-			ArrayList<Tuple> alTuple = importAndExportDataBase.ExportD();
-			List<ArrayList<Tuple>> result = period.create(alTuple);
-			int copy = 50;
+			alTuple = importAndExportDataBase.ExportD();
+			result = period.create(alTuple);
+			int copy = 500;
 			for (int j = 0; j < interval.length; j++) {
-				long vtMax = result.get(0).get(0).getRight();
-				long vtMin = result.get(0).get(0).getLeft();
 				ValidTime[] query = new ValidTime[copy];
-				for (int k = 0; k < copy; k++) {// 随机生成repeatCount个查询窗口
-					long qvts = (long) ((vtMax - vtMin) * (1 - interval[j]) * Math.random() + vtMin);
-					long qvte = (long) (qvts + (vtMax - vtMin) * interval[j]);
-					query[k] = new ValidTime(qvts, qvte);
-				} // copy个查询窗口
+				try {
+					long vtMax = new SimpleDateFormat("YY-MM-DD").parse("2030-04-01").getTime();
+					long vtMin = new SimpleDateFormat("YY-MM-DD").parse("1980-04-01").getTime();
+
+					for (int k = 0; k < copy; k++) {// 随机生成repeatCount个查询窗口
+						long qvts = (long) ((vtMax - vtMin) * (1 - interval[j]) * Math.random() + vtMin);
+						long qvte = (long) (qvts + (vtMax - vtMin) * interval[j]);
+						query[k] = new ValidTime(qvts, qvte);
+					} // copy个查询窗口
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 				for (int m = 0; m < strategy.length; m++) {
 					String fileName = "period_" + strategy[m] + "_" + format + ".lab";
 					int sum = 0;
 					String data = "";
 					for (int k = 0; k < copy; k++) {
 						switch (strategy[m]) {
-						case 9:
+						case 8:
 							period.queryTraversal(result, query[k]);
 							break;
-						case 8:
+						case 9:
 							period.queryBinaryChop(result, query[k]);
+							break;
+						case 10:
+							period.querySequence(result, query[k]);
 							break;
 						default:
 							break;
 						}
 						sum += period.getTime()[4];
 					}
-					data += dataCount[i] + " " + interval[j] + " " + " " + strategy[m] + " " + (sum / copy) + "/n";
+					data += dataCount[i] + " " + interval[j] + " " + " " + strategy[m] + " " + (sum / copy) + "\n";
 					fh.write(fileName, data);
 				}
 
@@ -207,10 +265,12 @@ public class Lab {
 
 	public static void main(String[] args) {
 		int c = 1000000;
-		int[] s = { 8, 9 };
-		for (int i = 1; i <= 6; i++) {
+		int[] s = { 10 };
+		for (int i = 3; i <= 6; i++) {
 			// labInterval(i * c );
 			// System.out.println("labInterval " + (i * c ));
+			// labDisk(i * c);
+			// System.out.println("labDisk " + (i * c));
 			labPeriod(s, i * c);
 			System.out.println("labPeriod " + (i * c));
 			// labProjection(i * c );
