@@ -30,7 +30,7 @@ public class CreateService {
 		for (int i = 0; i < tableName.size(); i++) {
 			LOB lobCreate = new LOB();
 			lobCreate.setTableName(tableName.get(i));
-			lobCreate.disk123Create();
+			lobCreate.disk012Create();
 			expense += lobCreate.getExpense();
 			resultNum += lobCreate.getBranchCount();
 		}

@@ -13,11 +13,13 @@ import cn.edu.scnu.TempMT_Index.dao.DAOFactory;
 
 /**
  * @author CXH
- *
+ * 公用常量
  */
 public class CONTANT {
 	public static final String rootPath = new File(
 			CONTANT.class.getClassLoader().getResource(DAOFactory.Mysql + ".properties").getFile()).getParentFile()
 					.getParentFile().getParentFile().getAbsolutePath();
 	public static final String srcPath = System.getProperty("user.dir");
+	public static final String labPath = rootPath+"\\lab";
+	public static final String indexPath = rootPath+"\\tdindex";
 }

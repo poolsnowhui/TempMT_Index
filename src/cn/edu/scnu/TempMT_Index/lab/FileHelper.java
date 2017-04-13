@@ -43,7 +43,7 @@ public class FileHelper {
 	private static String dirName;
 
 	static {
-		dirName = CONTANT.rootPath + "\\lab";
+		dirName = CONTANT.labPath;
 		fw = null;
 		fr = null;
 		br = null;

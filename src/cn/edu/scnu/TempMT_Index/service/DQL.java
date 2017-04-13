@@ -441,7 +441,7 @@ public class DQL {
 		reMessage.setRecordNum(lobQuery.getResultNum() + "");
 		reMessage.setSql(mysql);
 		reMessage.setStragey(lobQuery.getStrategy() + "");
-		reMessage.setTimeExpense(lobQuery.getExpense() + "");
+		reMessage.setTimeExpense(lobQuery.getTime()[4] + "");
 		reMessage.setType("时态选择-期间包含");
 		// System.out.println(reMessage.toString());
 		reMessage.setTableContent(dqlResult);
