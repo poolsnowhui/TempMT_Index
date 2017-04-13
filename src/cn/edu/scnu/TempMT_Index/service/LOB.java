@@ -162,6 +162,64 @@ public class LOB {
 	}
 
 	/**
+	 * 2.索引存磁盘,分成小文件存储,上层为一个文件root.idx,每一条分支存一个文件
+	 * 
+	 * @return
+	 */
+	private boolean storeToDisk2(List<ArrayList<Tuple>> alalTuple) {
+		long start = System.currentTimeMillis();
+		System.out.println("索引磁盘路径" + indexFolder);
+		// 写文件
+		DataOutputStream dos = null;
+		DataOutputStream leaf = null;
+		try {
+			File rootfile = new File(indexFolder + "\\" + tableName, "root.idx");
+			rootfile.getParentFile().mkdirs();// 建目录
+			rootfile.createNewFile();// 建文件
+			FileOutputStream fos = new FileOutputStream(rootfile);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			dos = new DataOutputStream(bos);
+			String data = "";
+			for (int i = 0, len = alalTuple.size(); i < len; i++) {
+				int lenj = alalTuple.get(i).size();
+				data = i + "##" + alalTuple.get(i).get(0).getVt().getLeft() + ","
+						+ alalTuple.get(i).get(0).getVt().getRight() + "##"
+						+ alalTuple.get(i).get(lenj - 1).getVt().getLeft() + ","
+						+ alalTuple.get(i).get(lenj - 1).getVt().getRight() + "\n";
+				dos.writeBytes(data);
+				dos.flush();
+				File leafFile = new File(indexFolder + "\\" + tableName, i + ".idx");
+				leafFile.getParentFile().mkdirs();// 建目录
+				leafFile.createNewFile();// 建文件
+				leaf = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(leafFile)));
+				for (int j = 0; j < lenj; j++) {
+					data = alalTuple.get(i).get(j).toString() + "\n";
+					leaf.writeBytes(data);
+					leaf.flush();
+				}
+			}
+			System.out.println("存磁盘success.索引位置：" + indexFolder + "\\" + tableName);
+
+		} catch (IOException e) {
+			Logger.getLogger(LOB.class).error(e);
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+		} finally {
+			if (dos != null) {
+				try {
+					dos.close();
+				} catch (IOException e) {
+					Logger.getLogger(LOB.class).error(e);
+					e.printStackTrace();
+					throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+				}
+			}
+		}
+		time[2] = System.currentTimeMillis() - start;
+		return true;
+	}
+
+	/**
 	 * 2.索引存磁盘
 	 * 
 	 * @return
@@ -260,6 +318,180 @@ public class LOB {
 	}
 
 	/**
+	 * 磁盘建索引的过程2
+	 */
+	public boolean disk012Create2() {
+		// long start = System.currentTimeMillis();
+		List<Tuple> result1 = sqlQuery();// 1.全表查
+		// time1 = System.currentTimeMillis() - start;
+		List<ArrayList<Tuple>> result2 = create(result1);// 2.建索引
+		result1 = null;
+		// time2 = System.currentTimeMillis() - start - time1;
+		storeToDisk2(result2);// 3.索引存磁盘
+		// time3 = System.currentTimeMillis() - start - time1 - time2;
+		return true;
+	}
+
+	/**
+	 * 3.从磁盘中读索引2
+	 * 
+	 * @return
+	 */
+
+	private List<ValidTime[]> readFromDisk2() {
+		long start = System.currentTimeMillis();
+		File rootfile = new File(indexFolder + "\\" + tableName, "root.idx");
+		List<ValidTime[]> listRootVT = new ArrayList<>();
+		FileReader fr = null;
+		BufferedReader br = null;
+		try {
+			fr = new FileReader(rootfile);
+			br = new BufferedReader(fr);
+			String line = "";
+			String[] obj = null;
+			String[] objVT = null;
+			for (int i = 0; (line = br.readLine()) != null; i++) {
+				obj = line.split("##");
+				System.out.println(obj[0]);
+				if (FUNCTION.isInteger(obj[0]) && Integer.valueOf(obj[0]) == i && obj.length == 3) {
+					ValidTime[] rootVT = new ValidTime[2];
+					objVT = obj[1].split(",");
+					if (objVT.length == 2) {
+						rootVT[0] = new ValidTime(Long.parseLong(objVT[0]), Long.parseLong(objVT[1]));
+//						System.out.println(rootVT[0]);
+					} else {
+						System.err.println("文件有异常");
+					}
+					objVT = obj[2].split(",");
+					if (objVT.length == 2) {
+						rootVT[1] = new ValidTime(Long.parseLong(objVT[0]), Long.parseLong(objVT[1]));
+//						System.out.println(rootVT[1]);
+					} else {
+						System.err.println("文件有异常");
+					}
+					listRootVT.add(rootVT);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();// 控制台输出异常，供开发使用
+			throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+		} catch (IOException e) {
+			e.printStackTrace();// 控制台输出异常，供开发使用
+			throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+		} finally {
+			try {
+				br.close();
+				fr.close();
+			} catch (IOException e) {
+				e.printStackTrace();// 控制台输出异常，供开发使用
+				throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+			}
+		}
+		time[3] = System.currentTimeMillis() - start;
+		return listRootVT;
+	}
+
+	/**
+	 * 
+	 * @param listRootVT
+	 * @param query
+	 * @return
+	 */
+	private List<Tuple> queryTraversalDISK(List<ValidTime[]> listRootVT, ValidTime query) {
+		long start = System.currentTimeMillis();
+		File leafFile = new File(indexFolder + "\\" + tableName, "root.idx");
+		FileReader fr = null;
+		BufferedReader br = null;
+		// 左时间比右时间大时，查询区间有误返回null
+		if (query.getLeft() > query.getRight()) {
+			return null;
+		}
+		// 开始查询
+		ArrayList<Tuple> queryResult = new ArrayList<Tuple>();// 查询结果
+		for (int i = 0; i < listRootVT.size(); i++) {
+			// 索引的分支数，i分支
+			// 1
+			if (listRootVT.get(i)[0].getLeft() > query.getLeft()) {
+				// 所有分支都不是，退出查询
+				break;
+			} else {
+				// 2.1
+				try {
+					if (listRootVT.get(i)[0].getRight() < query.getRight()) {
+						// 整条分支都不是，头就不包含
+						continue;
+					} else if (listRootVT.get(i)[1].getLeft() <= query.getLeft()
+							&& listRootVT.get(i)[1].getRight() >= query.getRight()) {
+						// 2.2
+						// 尾部区间包含查询区间时，说明整条分支都是。
+						System.out.println(indexFolder + "\\" + tableName + "," + i + ".idx");
+						leafFile = new File(indexFolder + "\\" + tableName, i + ".idx");
+						fr = new FileReader(leafFile);
+						br = new BufferedReader(fr);
+						String line = "";
+						String[] obj = null;
+						// String[] objVT = null;
+						// ValidTime[] rootVT = new ValidTime[2];
+						for (; (line = br.readLine()) != null;) {
+							obj = line.split(",");// 取得单个validtime对象
+							queryResult.add(new Tuple(obj));
+						}
+						// queryResult.addAll(alalTuple.get(i));// 整条分支放入查询结果集中
+						continue;
+					} else {
+						// 2.3
+						// 部分分支是
+						leafFile = new File(indexFolder + "\\" + tableName, i + ".idx");
+						fr = new FileReader(leafFile);
+						br = new BufferedReader(fr);
+						String line = "";
+						String[] obj = null;
+						Tuple temp = null;
+						// String[] objVT = null;
+						// ValidTime[] rootVT = new ValidTime[2];
+						for (; (line = br.readLine()) != null;) {
+							obj = line.split(",");// 取得单个validtime对象
+							temp = new Tuple(obj);
+							if (temp.getVt().getLeft() <= query.getLeft()
+									&& temp.getVt().getRight() >= query.getRight()) {
+								queryResult.add(temp);
+							}
+						}
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();// 控制台输出异常，供开发使用
+					throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+				} catch (IOException e) {
+					e.printStackTrace();// 控制台输出异常，供开发使用
+					throw new RuntimeException(e.getMessage());// 抛出运行异常，供错误提示使用
+				}
+			}
+
+		}
+
+		System.out.println("查询成功！共" + queryResult.size() + "个区间");
+		time[4] = System.currentTimeMillis() - start;
+		return queryResult;
+
+	}
+
+	/**
+	 * 从磁盘中读取分文件的索引2，并查找
+	 * 
+	 * @param query
+	 * @return
+	 */
+	public List<Tuple> queryFromDisk(ValidTime query) {
+		List<ValidTime[]> listRootVT = readFromDisk2();
+		for (int i = 0; i < listRootVT.size(); i++) {
+			System.out.println(listRootVT.get(i)[0]);
+			System.out.println(listRootVT.get(i)[1]);
+		}
+		List<Tuple> result = queryTraversalDISK(listRootVT, query);
+		return result;
+	}
+
+	/**
 	 * 3.从磁盘中读索引
 	 * 
 	 * @return
@@ -349,12 +581,12 @@ public class LOB {
 					}
 				}
 			}
-	
+
 		}
 		System.out.println("查询成功！共" + queryResult.size() + "个区间");
 		time[4] = System.currentTimeMillis() - start;
 		return queryResult;
-	
+
 	}
 
 	/**

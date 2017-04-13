@@ -266,7 +266,7 @@ public class Lab {
 	public static void main(String[] args) {
 		int c = 1000000;
 		int[] s = { 10 };
-		for (int i = 6; i <= 6; i++) {
+		for (int i = 1; i <= 2; i++) {
 			// labInterval(i * c );
 			// System.out.println("labInterval " + (i * c ));
 			// labDisk(i * c);

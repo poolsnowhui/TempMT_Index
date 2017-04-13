@@ -1,13 +1,12 @@
 package cn.edu.scnu.TempMT_Index.lab;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.edu.scnu.TempMT_Index.service.DDL;
 import cn.edu.scnu.TempMT_Index.service.DML;
 import cn.edu.scnu.TempMT_Index.service.DQL;
 import cn.edu.scnu.TempMT_Index.service.Format;
+import cn.edu.scnu.TempMT_Index.service.LOB;
 
 public class LabData {
 
@@ -86,36 +85,24 @@ public class LabData {
 	}
 
 	public static void main(String[] args) {
-
-		String tableName = "stu_table";
-		String atsql = "validtime period [date '2000-06-01' - date '2008-01-11' ] select * from " + tableName;
-		Integer[] dataNum = new Integer[] { 2, 5, 15, 20, 30, 40, 45, 50 };
-		String[] lob = new String[] { "0", "4", "5", "6", "7", };
-		LabData labData = new LabData();
-		String[] parameters = null;
-		List<List<ExcelInterface>> alalstu = new ArrayList<>();
-		for (int i = 0; i < lob.length; i++) {
-			List<ExcelInterface> alTemp = new ArrayList<>();
-			for (int j = 0; j < dataNum.length; j++) {
-				ExcelInterface temp = new ExcelInterface();
-				long avg = 0;
-				for (int k = 0; k < 5; k++) {
-					temp = labData.translate(atsql + dataNum[j] + "k;", "0", lob[i], parameters);
-					avg += temp.expense;
-				}
-				temp.expense = avg / 5;
-				System.out.println(temp.expense);
-				alTemp.add(temp);
-			}
-			alalstu.add(alTemp);
-		}
-		try {
-			ExcelInterface.javaToExcel(alalstu);
-		} catch (IOException e) {
-			e.printStackTrace();// 开发用
-			throw new RuntimeException(e.getMessage());// 上线用
-		}
-		System.out.println("d:\\LOB查询实验结果分析1204.xml已生成，该xml是专门以excel打开的xml");
+		LOB disk2 = new LOB();
+		disk2.setTableName("student1000k");
+		disk2.disk012Create2();
+		disk2.setTableName("student2000k");
+		disk2.disk012Create2();
+		disk2.setTableName("student3000k");
+		disk2.disk012Create2();
+		disk2.setTableName("student4000k");
+		disk2.disk012Create2();
+		disk2.setTableName("student5000k");
+		disk2.disk012Create2();
+		// List<Tuple> result = disk2.queryFromDisk(new
+		// ValidTime(1075716136000l, 1081059508000l));
+		// for (int i = 0; i < result.size(); i++) {
+		// System.out.println(result.get(i).toString());
+		// }
+		// long time = disk2.getTime()[3] + disk2.getTime()[4];
+		// System.out.println("所用开销:" + time + "ms");
 	}
 
 	public String getStr() {

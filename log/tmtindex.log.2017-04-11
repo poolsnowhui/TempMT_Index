@@ -1,0 +1,1 @@
+2017-04-11 20:32:43,245 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.executeQuery(MysqlDAO.java:125) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'tmtindex.student800k' doesn't exist
