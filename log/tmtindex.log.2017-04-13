@@ -1,0 +1,3 @@
+2017-04-13 21:34:33,455 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.executeQuery(MysqlDAO.java:125) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'lab_big.student1k' doesn't exist
+2017-04-13 21:36:53,790 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.executeQuery(MysqlDAO.java:125) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'tmtindex.student1000k' doesn't exist
+2017-04-13 21:38:35,377 [ERROR] cn.edu.scnu.TempMT_Index.dao.MysqlDAO.executeQuery(MysqlDAO.java:125) - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'lab_big.student1k' doesn't exist

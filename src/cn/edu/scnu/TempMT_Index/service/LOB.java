@@ -352,7 +352,7 @@ public class LOB {
 			String[] objVT = null;
 			for (int i = 0; (line = br.readLine()) != null; i++) {
 				obj = line.split("##");
-				System.out.println(obj[0]);
+//				System.out.println(obj[0]);
 				if (FUNCTION.isInteger(obj[0]) && Integer.valueOf(obj[0]) == i && obj.length == 3) {
 					ValidTime[] rootVT = new ValidTime[2];
 					objVT = obj[1].split(",");
@@ -424,7 +424,7 @@ public class LOB {
 							&& listRootVT.get(i)[1].getRight() >= query.getRight()) {
 						// 2.2
 						// 尾部区间包含查询区间时，说明整条分支都是。
-						System.out.println(indexFolder + "\\" + tableName + "," + i + ".idx");
+//						System.out.println(indexFolder + "\\" + tableName + "," + i + ".idx");
 						leafFile = new File(indexFolder + "\\" + tableName, i + ".idx");
 						fr = new FileReader(leafFile);
 						br = new BufferedReader(fr);
@@ -484,8 +484,8 @@ public class LOB {
 	public List<Tuple> queryFromDisk(ValidTime query) {
 		List<ValidTime[]> listRootVT = readFromDisk2();
 		for (int i = 0; i < listRootVT.size(); i++) {
-			System.out.println(listRootVT.get(i)[0]);
-			System.out.println(listRootVT.get(i)[1]);
+//			System.out.println(listRootVT.get(i)[0]);
+//			System.out.println(listRootVT.get(i)[1]);
 		}
 		List<Tuple> result = queryTraversalDISK(listRootVT, query);
 		return result;
@@ -1029,9 +1029,9 @@ public class LOB {
 	public ArrayList<Tuple> queryNoLOB(String tableName, ValidTime query) {
 		long start = System.currentTimeMillis();
 
-		String mysql = "select * from " + tableName + "where vts_timeDB <= " + query.getLeftString()
-				+ " and vte_timeDB >= " + query.getRightString() + ";";
-		// System.out.println(mysql);
+		String mysql = "select * from " + tableName + " where vts_timeDB <= \"" + query.getLeftString()
+				+ "\" and vte_timeDB >= \"" + query.getRightString() + "\" ; ";
+		 System.out.println(mysql);
 		List<Object[]> source = null;
 		try {
 			source = DAOFactory.getInstance().executeQuery(mysql);

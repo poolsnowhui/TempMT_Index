@@ -1,8 +1,12 @@
 package demo;
 
 import java.io.File;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import cn.edu.scnu.TempMT_Index.dao.DAOFactory;
 
 public class LoggerDemo {
 	public static void main(String[] args) {
@@ -22,6 +26,18 @@ public class LoggerDemo {
 //		信息: fine
 //		D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\build\classes;D:\xampp\tomcat\lib\annotations-api.jar;D:\xampp\tomcat\lib\catalina-ant.jar;D:\xampp\tomcat\lib\catalina-ha.jar;D:\xampp\tomcat\lib\catalina-tribes.jar;D:\xampp\tomcat\lib\catalina.jar;D:\xampp\tomcat\lib\commons-logging-1.2.jar;D:\xampp\tomcat\lib\ecj-4.4.2.jar;D:\xampp\tomcat\lib\ecj-4.4.jar;D:\xampp\tomcat\lib\el-api.jar;D:\xampp\tomcat\lib\jasper-el.jar;D:\xampp\tomcat\lib\jasper.jar;D:\xampp\tomcat\lib\jsp-api.jar;D:\xampp\tomcat\lib\servlet-api.jar;D:\xampp\tomcat\lib\tomcat-api.jar;D:\xampp\tomcat\lib\tomcat-coyote.jar;D:\xampp\tomcat\lib\tomcat-dbcp.jar;D:\xampp\tomcat\lib\tomcat-i18n-es.jar;D:\xampp\tomcat\lib\tomcat-i18n-fr.jar;D:\xampp\tomcat\lib\tomcat-i18n-ja.jar;D:\xampp\tomcat\lib\tomcat-jdbc.jar;D:\xampp\tomcat\lib\tomcat-util.jar;D:\xampp\tomcat\lib\tomcat7-websocket.jar;D:\xampp\tomcat\lib\websocket-api.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\commons-beanutils-1.8.0.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\commons-chain-1.2.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\commons-digester-2.0.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\commons-logging-1.1.3.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\json.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\log4j-1.2.13.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\mysql-connector-java-5.1.6-bin.jar;D:\Users\CXH\Documents\java\workspaceWithJ2EE\tempdb\WebRoot\WEB-INF\lib\struts-core-1.3.10.jar
 //		/D:/Users/CXH/Documents/java/workspaceWithJ2EE/tempdb/build/classes/cn
-
+		long st  = System.currentTimeMillis();
+		String mysql = "select * from student1000k where vts_timeDB <= \"2009-05-19 09:16:43\" and vte_timeDB >= \"2014-05-19 16:28:43\"" ; 
+		System.out.println(mysql);
+		try {
+			List<Object[]> executeQuery = DAOFactory.getInstance().executeQuery(mysql);
+			List<Object[]> executeQuery2 = DAOFactory.getInstance().executeQuery(mysql);
+			List<Object[]> executeQuery3 = DAOFactory.getInstance().executeQuery(mysql);
+			List<Object[]> executeQuery4 = DAOFactory.getInstance().executeQuery(mysql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println((System.currentTimeMillis()-st)/4);
 	}
 }

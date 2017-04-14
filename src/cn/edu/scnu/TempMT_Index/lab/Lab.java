@@ -166,14 +166,14 @@ public class Lab {
 	public static void labDisk(int... dataCount) {
 		LOB disk = new LOB();
 		double[] interval = { 0.1 };
-		int[] strategy = { 9 };
+		int[] strategy = { 8 };
 		String format = FUNCTION.getCurrDate();
 		FileHelper fh = FileHelper.getInstance();
 		for (int i = 0; i < dataCount.length; i++) {
 			String tableName = "student" + (dataCount[i] / 1000) + "k";
 			disk.setFromDisk(true);
 			disk.setTableName(tableName);
-			int copy = 500;
+			int copy = 50;
 			for (int j = 0; j < interval.length; j++) {
 				ValidTime[] query = new ValidTime[copy];
 				try {
@@ -190,36 +190,41 @@ public class Lab {
 				}
 				for (int m = 0; m < strategy.length; m++) {
 					disk.setStrategy(strategy[m]);
-					String fileName = "period(disk)_" + strategy[m] + "_" + format + ".lab";
+					String fileName = "period(disk_fwj)_" + strategy[m] + "_" + format + ".lab";
 					int sum = 0;
 					String data = "";
 					for (int k = 0; k < copy; k++) {
 						disk.setQuery(query[k]);
-						disk.queryProcess();
+						disk.queryFromDisk(query[k]);
+						// disk.queryProcess();
+						System.out.println(disk.getTime()[3] + disk.getTime()[4]);
 						sum += disk.getTime()[3] + disk.getTime()[4];
 					}
 					data += dataCount[i] + " " + interval[j] + " " + " " + strategy[m] + " " + (sum / copy) + "\n";
+					System.out.println(sum / copy + "ms");
 					fh.write(fileName, data);
 				}
 			}
 		}
 	}
 
-	public static void labPeriod(int strategy[], int... dataCount) {
+	public static void labPeriodMysql(int strategy[], int... dataCount) {
 		LOB period = new LOB();
 		double[] interval = { 0.1 };
 		String format = FUNCTION.getCurrDate();
 		FileHelper fh = FileHelper.getInstance();
-		List<ArrayList<Tuple>> result = new ArrayList<>();
-		ArrayList<Tuple> alTuple = new ArrayList<>();
-		ImportAndExportDataBase importAndExportDataBase = new ImportAndExportDataBase();
+		// List<ArrayList<Tuple>> result = new ArrayList<>();
+		// ArrayList<Tuple> alTuple = new ArrayList<>();
+		// ImportAndExportDataBase importAndExportDataBase = new
+		// ImportAndExportDataBase();
 		for (int i = 0; i < dataCount.length; i++) {
 			// 1.从数据库中来
-			importAndExportDataBase = new ImportAndExportDataBase();
-			importAndExportDataBase.setDataCount(dataCount[i]);
-			alTuple = importAndExportDataBase.ExportD();
-			result = period.create(alTuple);
-			int copy = 500;
+			String tableName = "student" + (dataCount[i] / 1000) + "k";
+			// importAndExportDataBase = new ImportAndExportDataBase();
+			// importAndExportDataBase.setDataCount(dataCount[i]);
+			// alTuple = importAndExportDataBase.ExportD();
+			// result = period.create(alTuple);
+			int copy = 50;
 			for (int j = 0; j < interval.length; j++) {
 				ValidTime[] query = new ValidTime[copy];
 				try {
@@ -240,6 +245,76 @@ public class Lab {
 					String data = "";
 					for (int k = 0; k < copy; k++) {
 						switch (strategy[m]) {
+						case 0:
+							period.queryNoLOB(tableName, query[k]);
+							// case 8:
+							// period.queryTraversal(result, query[k]);
+							// break;
+							// case 9:
+							// period.queryBinaryChop(result, query[k]);
+							// break;
+							// case 10:
+							// period.querySequence(result, query[k]);
+							// break;
+						default:
+							break;
+						}
+						System.out.println(period.getTime()[4]);
+						sum += period.getTime()[4];
+					}
+					data += dataCount[i] + " " + interval[j] + " " + " " + strategy[m] + " " + (sum / copy) + "\n";
+					System.out.println(sum / copy + "ms");
+					fh.write(fileName, data);
+				}
+
+			}
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param strategy
+	 * @param dataCount
+	 */
+	public static void labPeriod(int strategy[], int... dataCount) {
+		LOB period = new LOB();
+		double[] interval = { 0.1 };
+		String format = FUNCTION.getCurrDate();
+		FileHelper fh = FileHelper.getInstance();
+		List<ArrayList<Tuple>> result = new ArrayList<>();
+		ArrayList<Tuple> alTuple = new ArrayList<>();
+		ImportAndExportDataBase importAndExportDataBase = new ImportAndExportDataBase();
+		for (int i = 0; i < dataCount.length; i++) {
+			// 1.从数据库中来
+			// String tableName = "student" + (dataCount[i] / 1000) + "k";
+			importAndExportDataBase = new ImportAndExportDataBase();
+			importAndExportDataBase.setDataCount(dataCount[i]);
+			alTuple = importAndExportDataBase.ExportD();
+			result = period.create(alTuple);
+			int copy = 50;
+			for (int j = 0; j < interval.length; j++) {
+				ValidTime[] query = new ValidTime[copy];
+				try {
+					long vtMax = new SimpleDateFormat("YY-MM-DD").parse("2030-04-01").getTime();
+					long vtMin = new SimpleDateFormat("YY-MM-DD").parse("1980-04-01").getTime();
+
+					for (int k = 0; k < copy; k++) {// 随机生成repeatCount个查询窗口
+						long qvts = (long) ((vtMax - vtMin) * (1 - interval[j]) * Math.random() + vtMin);
+						long qvte = (long) (qvts + (vtMax - vtMin) * interval[j]);
+						query[k] = new ValidTime(qvts, qvte);
+					} // copy个查询窗口
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				for (int m = 0; m < strategy.length; m++) {
+					String fileName = "period_" + strategy[m] + "_" + format + ".lab";
+					int sum = 0;
+					String data = "";
+					for (int k = 0; k < copy; k++) {
+						switch (strategy[m]) {
+						// case 0:
+						// period.queryNoLOB(tableName, query[k]);
 						case 8:
 							period.queryTraversal(result, query[k]);
 							break;
@@ -252,9 +327,11 @@ public class Lab {
 						default:
 							break;
 						}
+						System.out.println(period.getTime()[4]);
 						sum += period.getTime()[4];
 					}
 					data += dataCount[i] + " " + interval[j] + " " + " " + strategy[m] + " " + (sum / copy) + "\n";
+					System.out.println(sum / copy + "ms");
 					fh.write(fileName, data);
 				}
 
@@ -265,14 +342,18 @@ public class Lab {
 
 	public static void main(String[] args) {
 		int c = 1000000;
-		int[] s = { 10 };
-		for (int i = 1; i <= 2; i++) {
+		int[] s = { 0 };
+		for (int i = 1; i <= 5; i++) {
 			// labInterval(i * c );
 			// System.out.println("labInterval " + (i * c ));
 			// labDisk(i * c);
 			// System.out.println("labDisk " + (i * c));
-			labPeriod(s, i * c);
+			labPeriodMysql(s, i * c);
 			System.out.println("labPeriod " + (i * c));
+			// labPeriod(s, i * c);
+			// System.out.println("labPeriod " + (i * c));
+			 labDisk(i * c);
+			 System.out.println("labDisk " + (i * c));
 			// labProjection(i * c );
 			// System.out.println("labProjection " + (i * c ));
 			// labSnap(i * c );
