@@ -342,18 +342,18 @@ public class Lab {
 
 	public static void main(String[] args) {
 		int c = 1000000;
-		int[] s = { 0 };
+		// int[] s = { 0 };
 		for (int i = 1; i <= 5; i++) {
 			// labInterval(i * c );
 			// System.out.println("labInterval " + (i * c ));
 			// labDisk(i * c);
 			// System.out.println("labDisk " + (i * c));
-			labPeriodMysql(s, i * c);
-			System.out.println("labPeriod " + (i * c));
+			// labPeriodMysql(s, i * c);
+			// System.out.println("labPeriod " + (i * c));
 			// labPeriod(s, i * c);
 			// System.out.println("labPeriod " + (i * c));
-			 labDisk(i * c);
-			 System.out.println("labDisk " + (i * c));
+			labDisk(i * c);
+			System.out.println("labDisk " + (i * c));
 			// labProjection(i * c );
 			// System.out.println("labProjection " + (i * c ));
 			// labSnap(i * c );

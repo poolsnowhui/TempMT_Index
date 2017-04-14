@@ -10,7 +10,6 @@ import cn.edu.scnu.TempMT_Index.service.LOB;
 
 public class LabData {
 
-	private String str = "";
 	private List<String> strarray;
 
 	public ExcelInterface translate(String atsql, String lob, String isFromDisk, String[] parameters) {
@@ -37,7 +36,7 @@ public class LabData {
 				dql.setFromDisk(Integer.valueOf(isFromDisk) == 1 ? true : false);
 
 				try {
-					setStr(dql.translate(atsql, parameters));
+					dql.translate(atsql, parameters);
 					indexType = dql.getIndexType();// 索引类型
 				} catch (Exception e) {
 					message = e.getMessage();
@@ -49,7 +48,7 @@ public class LabData {
 			} else if (strarray.get(i).equalsIgnoreCase(DDL.create) || strarray.get(i).equalsIgnoreCase(DDL.drop)) {
 				DDL ddl = new DDL();
 				try {
-					setStr(ddl.translate(atsql, parameters));
+					ddl.translate(atsql, parameters);
 					message = "" + ddl.getMessage();
 				} catch (Exception e) {
 					message = e.getMessage();
@@ -59,7 +58,7 @@ public class LabData {
 			} else if (strarray.get(i).equalsIgnoreCase(DML.insert)) {
 				DML dml = new DML();
 				try {
-					setStr(dml.translate(atsql, parameters));
+					dml.translate(atsql, parameters);
 
 				} catch (Exception e) {
 					message = e.getMessage();
@@ -86,16 +85,16 @@ public class LabData {
 
 	public static void main(String[] args) {
 		LOB disk2 = new LOB();
-		disk2.setTableName("student1000k");
-		disk2.disk012Create2();
-		disk2.setTableName("student2000k");
-		disk2.disk012Create2();
-		disk2.setTableName("student3000k");
-		disk2.disk012Create2();
-		disk2.setTableName("student4000k");
-		disk2.disk012Create2();
-		disk2.setTableName("student5000k");
-		disk2.disk012Create2();
+		// disk2.setTableName("student1000k");
+		// disk2.disk012Create2();
+//		disk2.setTableName("student2000k");
+//		disk2.disk012Create2();
+		 disk2.setTableName("student3000k");
+		 disk2.disk012Create2();
+		 disk2.setTableName("student4000k");
+		 disk2.disk012Create2();
+		 disk2.setTableName("student5000k");
+		 disk2.disk012Create2();
 		// List<Tuple> result = disk2.queryFromDisk(new
 		// ValidTime(1075716136000l, 1081059508000l));
 		// for (int i = 0; i < result.size(); i++) {
@@ -105,11 +104,4 @@ public class LabData {
 		// System.out.println("所用开销:" + time + "ms");
 	}
 
-	public String getStr() {
-		return str;
-	}
-
-	public void setStr(String str) {
-		this.str = str;
-	}
 }
