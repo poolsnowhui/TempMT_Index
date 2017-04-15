@@ -352,20 +352,20 @@ public class LOB {
 			String[] objVT = null;
 			for (int i = 0; (line = br.readLine()) != null; i++) {
 				obj = line.split("##");
-//				System.out.println(obj[0]);
+				// System.out.println(obj[0]);
 				if (FUNCTION.isInteger(obj[0]) && Integer.valueOf(obj[0]) == i && obj.length == 3) {
 					ValidTime[] rootVT = new ValidTime[2];
 					objVT = obj[1].split(",");
 					if (objVT.length == 2) {
 						rootVT[0] = new ValidTime(Long.parseLong(objVT[0]), Long.parseLong(objVT[1]));
-//						System.out.println(rootVT[0]);
+						// System.out.println(rootVT[0]);
 					} else {
 						System.err.println("文件有异常");
 					}
 					objVT = obj[2].split(",");
 					if (objVT.length == 2) {
 						rootVT[1] = new ValidTime(Long.parseLong(objVT[0]), Long.parseLong(objVT[1]));
-//						System.out.println(rootVT[1]);
+						// System.out.println(rootVT[1]);
 					} else {
 						System.err.println("文件有异常");
 					}
@@ -424,7 +424,8 @@ public class LOB {
 							&& listRootVT.get(i)[1].getRight() >= query.getRight()) {
 						// 2.2
 						// 尾部区间包含查询区间时，说明整条分支都是。
-//						System.out.println(indexFolder + "\\" + tableName + "," + i + ".idx");
+						// System.out.println(indexFolder + "\\" + tableName +
+						// "," + i + ".idx");
 						leafFile = new File(indexFolder + "\\" + tableName, i + ".idx");
 						fr = new FileReader(leafFile);
 						br = new BufferedReader(fr);
@@ -484,8 +485,8 @@ public class LOB {
 	public List<Tuple> queryFromDisk(ValidTime query) {
 		List<ValidTime[]> listRootVT = readFromDisk2();
 		for (int i = 0; i < listRootVT.size(); i++) {
-//			System.out.println(listRootVT.get(i)[0]);
-//			System.out.println(listRootVT.get(i)[1]);
+			// System.out.println(listRootVT.get(i)[0]);
+			// System.out.println(listRootVT.get(i)[1]);
 		}
 		List<Tuple> result = queryTraversalDISK(listRootVT, query);
 		return result;
@@ -627,7 +628,7 @@ public class LOB {
 					// 部分分支是（使用二分法查找）
 					int low = 0;
 					int high = resultLOB.get(i).size() - 1;
-					for (; low <= high;) {
+					for (; low < high;) {
 						int mid = (low + high) / 2;
 						// System.out.println(mid);
 						if (resultLOB.get(i).get(mid).getVt().getLeft() <= query.getLeft()
@@ -686,38 +687,76 @@ public class LOB {
 				} else {
 					// 2.3
 					// 部分分支是（使用二分法查找）
-					// 2.3.1找起点
-					// int xh = 0;
-					int mids = 0;
-					int lows = 0;
-					int highs = lop.get(i).size() - 1;
-					for (; lows < highs;) {
-						mids = (lows + highs) / 2;
-						// System.out.println(++xh + " " + lows + " " + mids + "
-						// " + highs);
-						if (lop.get(i).get(mids).getVt().getLeft() <= query.getLeft()) {
-							lows = mids + 1;
-						} else {
-							highs = mids - 1;
+					int low = 0;
+					int high = lop.get(i).size() - 1;
+					int single = 0;
+					int mid = (low + high) / 2;
+					for (; low < high;) {
+						mid = (low + high) / 2;
+						// System.out.println(mid);
+						if (single == 0) {// 起始序列一同二分
+							if (lop.get(i).get(mid).getVt().getLeft() <= query.getLeft()
+									&& lop.get(i).get(mid).getVt().getRight() >= query.getRight()) {
+								low = mid + 1;
+							} else if (lop.get(i).get(mid).getVt().getLeft() > query.getLeft()
+									&& lop.get(i).get(mid).getVt().getRight() < query.getRight()) {
+								high = mid - 1;
+							} else if (lop.get(i).get(mid).getVt().getLeft() > query.getLeft()
+									&& lop.get(i).get(mid).getVt().getRight() >= query.getRight()) {
+								high = mid - 1;
+								single = 1;
+							} else if (lop.get(i).get(mid).getVt().getLeft() <= query.getLeft()
+									&& lop.get(i).get(mid).getVt().getRight() < query.getRight()) {
+								high = mid - 1;
+								single = 2;
+							}
+						} else if (single == 1) {// 始点序列二分
+							if (lop.get(i).get(mid).getVt().getLeft() > query.getLeft()) {
+								high = mid - 1;
+							} else {
+								low = mid + 1;
+							}
+						} else if (single == 2) {// 终点序列二分
+							if (lop.get(i).get(mid).getVt().getRight() < query.getRight()) {
+								high = mid - 1;
+							} else {
+								low = mid + 1;
+							}
 						}
 					}
-					// 2.3.2找终点
-					// xh = 0;
-					int mide = 0;
-					int lowe = 0;
-					int highe = lop.get(i).size() - 1;
-					for (; lowe < highe;) {
-						mide = (lowe + highe) / 2;
-						// System.out.println(++xh + " " + lowe + " " + mide + "
-						// " + highe);
-						if (lop.get(i).get(mide).getVt().getRight() < query.getRight()) {
-
-							highe = mide - 1;
-						} else {
-							lowe = mide + 1;
-						}
-					}
-					int mid = Math.min(mids, mide);
+					// // 2.3.1找起点
+					// // int xh = 0;
+					// int mids = 0;
+					// int lows = 0;
+					// int highs = lop.get(i).size() - 1;
+					// for (; lows < highs;) {
+					// mids = (lows + highs) / 2;
+					// // System.out.println(++xh + " " + lows + " " + mids + "
+					// // " + highs);
+					// if (lop.get(i).get(mids).getVt().getLeft() <=
+					// query.getLeft()) {
+					// lows = mids + 1;
+					// } else {
+					// highs = mids - 1;
+					// }
+					// }
+					// // 2.3.2找终点
+					// // xh = 0;
+					// int mide = 0;
+					// int lowe = 0;
+					// int highe = lop.get(i).size() - 1;
+					// for (; lowe < highe;) {
+					// mide = (lowe + highe) / 2;
+					// // System.out.println(++xh + " " + lowe + " " + mide + "
+					// // " + highe);
+					// if (lop.get(i).get(mide).getVt().getRight() <
+					// query.getRight()) {
+					//
+					// highe = mide - 1;
+					// } else {
+					// lowe = mide + 1;
+					// }
+					// }
 					// System.out.println("mid" + mid);
 					for (int j = 0; j < mid; j++) {
 						queryResult.add(lop.get(i).get(j));
@@ -1031,7 +1070,7 @@ public class LOB {
 
 		String mysql = "select * from " + tableName + " where vts_timeDB <= \"" + query.getLeftString()
 				+ "\" and vte_timeDB >= \"" + query.getRightString() + "\" ; ";
-		 System.out.println(mysql);
+		System.out.println(mysql);
 		List<Object[]> source = null;
 		try {
 			source = DAOFactory.getInstance().executeQuery(mysql);
@@ -1492,12 +1531,25 @@ public class LOB {
 		System.out.println("create...");
 		List<ArrayList<Tuple>> create = test.create(lt);
 		System.out.println("query...");
-		List<Tuple> querySequence = test.queryBinaryChop(create, new ValidTime(4000, 5000));
+		List<Tuple> querySequence = test.querySequence(create, new ValidTime(4000, 5000));
 		for (int i = 0; i < querySequence.size(); i++) {
 			Tuple r = querySequence.get(i);
 			System.out.print(r.getNt());
 			System.out.println(r.getLeft() + "," + r.getRight());
 		}
+		/*
+		 *
+		 * 
+		 * 1,cxh,english,1000,10000 1,cxh,english,1000,9000
+		 * 1,cxh,english,1000,9000 1,cxh,english,1000,8000
+		 * 1,cxh,english,1000,7000 1,cxh,english,2000,7000
+		 * 1,cxh,english,2000,6000 1,cxh,english,2000,5000
+		 * 1,cxh,english,2000,9000 1,cxh,english,2000,8000
+		 * 1,cxh,english,3000,8000 1,cxh,english,3000,5000
+		 * 1,cxh,english,4000,5000 1,cxh,english,3000,9000
+		 * 1,cxh,english,4000,9000 1,cxh,english,4000,7000
+		 * 
+		 */
 	}
 
 }

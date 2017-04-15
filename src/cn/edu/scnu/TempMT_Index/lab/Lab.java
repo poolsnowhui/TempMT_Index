@@ -165,7 +165,7 @@ public class Lab {
 
 	public static void labDisk(int... dataCount) {
 		LOB disk = new LOB();
-		double[] interval = { 0.1 };
+		double[] interval = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 };
 		int[] strategy = { 8 };
 		String format = FUNCTION.getCurrDate();
 		FileHelper fh = FileHelper.getInstance();
@@ -210,7 +210,7 @@ public class Lab {
 
 	public static void labPeriodMysql(int strategy[], int... dataCount) {
 		LOB period = new LOB();
-		double[] interval = { 0.1 };
+		double[] interval = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 };
 		String format = FUNCTION.getCurrDate();
 		FileHelper fh = FileHelper.getInstance();
 		// List<ArrayList<Tuple>> result = new ArrayList<>();
@@ -343,17 +343,19 @@ public class Lab {
 	public static void main(String[] args) {
 		int c = 1000000;
 		// int[] s = { 0 };
-		for (int i = 1; i <= 5; i++) {
+		int[] s8910 = { 8, 9, 10 };
+		for (int i = 5; i <= 5; i++) {
 			// labInterval(i * c );
 			// System.out.println("labInterval " + (i * c ));
 			// labDisk(i * c);
 			// System.out.println("labDisk " + (i * c));
 			// labPeriodMysql(s, i * c);
 			// System.out.println("labPeriod " + (i * c));
-			// labPeriod(s, i * c);
-			// System.out.println("labPeriod " + (i * c));
-			labDisk(i * c);
-			System.out.println("labDisk " + (i * c));
+			// labDisk(i * c);
+			// System.out.println("labDisk " + (i * c));
+
+			labPeriod(s8910, i * c);
+			System.out.println("labPeriod " + (i * c));
 			// labProjection(i * c );
 			// System.out.println("labProjection " + (i * c ));
 			// labSnap(i * c );

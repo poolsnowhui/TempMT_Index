@@ -84,17 +84,22 @@ public class LabData {
 	}
 
 	public static void main(String[] args) {
-		LOB disk2 = new LOB();
+		// LOB disk2 = new LOB();
 		// disk2.setTableName("student1000k");
 		// disk2.disk012Create2();
-//		disk2.setTableName("student2000k");
-//		disk2.disk012Create2();
-		 disk2.setTableName("student3000k");
-		 disk2.disk012Create2();
-		 disk2.setTableName("student4000k");
-		 disk2.disk012Create2();
-		 disk2.setTableName("student5000k");
-		 disk2.disk012Create2();
+		// disk2.setTableName("student2000k");
+		// disk2.disk012Create2();
+		// disk2.setTableName("student3000k");
+		// disk2.disk012Create2();
+		LOB disk2 = new LOB();
+		disk2.setTableName("student4000k");
+		disk2.disk012Create2();
+		LOB disk3 = new LOB();
+		disk3.setTableName("student5000k");
+		disk3.disk012Create2();
+		LOB disk4 = new LOB();
+		disk4.setTableName("student6000k");
+		disk4.disk012Create2();
 		// List<Tuple> result = disk2.queryFromDisk(new
 		// ValidTime(1075716136000l, 1081059508000l));
 		// for (int i = 0; i < result.size(); i++) {
