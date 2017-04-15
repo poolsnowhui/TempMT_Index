@@ -32,17 +32,15 @@ public class Lab {
 	 */
 	public static void labQueryThread(double interval[], int threadCount[], int... dataCount) {
 
-		// double interval ={0.1,0.2};
+		// double interval ={0.1};
 		// int threadCount[] ={1,2,4,8};
-		// int dataCount[] ={1000000,2000000,3000000};
+		// int dataCount[] ={5000000};
 		LOB thread = new LOB();
 		thread.setSql(null);
-
 		int currThread = Runtime.getRuntime().availableProcessors();
-		int copy = 500;// 500条区间
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String format = simpleDateFormat.format(new Date());
-		String fileName = "thread_" + currThread + "_" + format + ".lab";
+		int copy = 50;// 500条区间
+		String format = FUNCTION.getCurrDate();
+		String fileName = "";
 		FileHelper fh = FileHelper.getInstance();
 		int[] strategy = { 12, 13, 14, 15 };
 		for (int i = 0; i < dataCount.length; i++) {
@@ -68,6 +66,7 @@ public class Lab {
 				int sum = 0;
 				String data = "";
 				for (int m = 0; m < strategy.length; m++) {
+					fileName = "thread_" + currThread + "_" + strategy[m] + "_" + format + ".lab";
 					for (int l = 0; l < threadCount.length; l++) {
 						thread.setThreadCount(threadCount[l]);
 						sum = 0;
@@ -344,6 +343,8 @@ public class Lab {
 		int c = 1000000;
 		// int[] s = { 0 };
 		int[] s8910 = { 8, 9, 10 };
+		double[] interval = { 0.1 };
+		int threadCount[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 		for (int i = 5; i <= 5; i++) {
 			// labInterval(i * c );
 			// System.out.println("labInterval " + (i * c ));
@@ -353,13 +354,14 @@ public class Lab {
 			// System.out.println("labPeriod " + (i * c));
 			// labDisk(i * c);
 			// System.out.println("labDisk " + (i * c));
-
 			labPeriod(s8910, i * c);
 			System.out.println("labPeriod " + (i * c));
 			// labProjection(i * c );
 			// System.out.println("labProjection " + (i * c ));
 			// labSnap(i * c );
 			// System.out.println("labSnap " + (i * c ));
+//			labQueryThread(interval, threadCount, i * c);
 		}
+
 	}
 }
