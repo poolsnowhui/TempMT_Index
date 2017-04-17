@@ -345,7 +345,7 @@ public class Lab {
 	public static void main(String[] args) {
 		int c = 1000000;
 		// int[] s = { 0 };
-		int[] s8910 = { 8, 9, 10 };
+		// int[] s8910 = { 8, 9, 10 };
 		double[] interval = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 };
 		int threadCount[] = { 8 };
 		for (int i = 1; i <= 6; i++) {
