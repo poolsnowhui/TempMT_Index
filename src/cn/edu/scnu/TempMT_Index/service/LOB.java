@@ -160,6 +160,43 @@ public class LOB {
 		time[1] = System.currentTimeMillis() - start;
 		return result;
 	}
+	/**
+	 * 1.99 用max(L)再建一条线序分支
+	 */
+	public List<ArrayList<Tuple>> createTOP(List<Tuple> alTuple) {
+		List<ArrayList<Tuple>> buttom = create(alTuple);
+		List<Tuple> max_l = new ArrayList<>();
+		for (ArrayList<Tuple> lop : buttom) {
+			max_l.add(lop.get(0));//获取每一条线序分支的第0个结点即max(l)
+		}
+		List<ArrayList<Tuple>> max_l_level = create(max_l);//对max(l)进行线序划分。
+		System.out.println("MAX(L)");
+		for (int i = 0; i < max_l_level.size(); i++) {
+			System.out.println(max_l_level.get(i));
+		}
+		List<Tuple> root = new ArrayList<>();
+		for (ArrayList<Tuple> lop : max_l_level) {
+			root.add(lop.get(0));//获取每一条线序分支的第0个结点
+		}
+		List<ArrayList<Tuple>> root_level = create(root);//对max(l)_level进行线序划分。
+		for (int i = 0; i < root_level.size(); i++) {
+			System.out.println(root_level.get(i));
+		}
+		
+		List<Tuple> min_l = new ArrayList<>();
+		for (ArrayList<Tuple> lop : buttom) {
+			min_l.add(lop.get(lop.size()-1));//获取每一条线序分支的最后一个结点即min(l)
+		}
+		List<ArrayList<Tuple>> min_l_level = create(min_l);//对min(l)进行线序划分。
+		System.out.println("MIN(L)");
+		for (int i = 0; i < min_l_level.size(); i++) {
+			System.out.println(min_l_level.get(i));
+		}
+		System.err.println("____________________");
+		
+		return buttom;
+		
+	}
 
 	/**
 	 * 2.索引存磁盘,分成小文件存储,上层为一个文件root.idx,每一条分支存一个文件
@@ -658,7 +695,6 @@ public class LOB {
 	 * @return
 	 */
 	public List<Tuple> querySequence(List<ArrayList<Tuple>> lop, ValidTime query) {
-		// TODO
 		long start = System.currentTimeMillis();
 		// 左时间比右时间大时，查询区间有误返回null
 		if (query.getLeft() > query.getRight()) {
@@ -1512,7 +1548,7 @@ public class LOB {
 	public static void main(String[] args) {
 		List<Tuple> lt = new ArrayList<>();
 		String s = "1,cxh,english";
-		long[][] l = { { 1, 10 }, { 1, 9 }, { 1, 8 }, { 1, 7 }, { 2, 7 }, { 2, 6 }, { 2, 5 }, { 2, 4 }, { 3, 4 },
+		long[][] l = { { 1, 10 }, { 1, 9 }, { 1, 8 }, { 1, 7 }, { 2, 7 }, { 2, 6 }, { 2, 5 }, { 2, 4 }, { 3, 4 },{4,4},
 				{ 2, 9 }, { 3, 9 }, { 5, 10 }, { 6, 10 }, { 2, 8 }, { 3, 8 }, { 4, 9 }, { 1, 9 }, { 5, 9 }, { 7, 9 },
 				{ 5, 8 }, { 7, 8 }, { 4, 7 }, { 5, 7 }, { 6, 7 }, { 5, 6 }, { 3, 5 }, { 4, 5 } };
 		for (int i = 0; i < l.length; i++) {
@@ -1529,7 +1565,7 @@ public class LOB {
 		// System.out.println(lt);
 		LOB test = new LOB();
 		System.out.println("create...");
-		List<ArrayList<Tuple>> create = test.create(lt);
+		List<ArrayList<Tuple>> create = test.createTOP(lt);
 		System.out.println("query...");
 		List<Tuple> querySequence = test.querySequence(create, new ValidTime(4000, 5000));
 		for (int i = 0; i < querySequence.size(); i++) {
@@ -1537,6 +1573,7 @@ public class LOB {
 			System.out.print(r.getNt());
 			System.out.println(r.getLeft() + "," + r.getRight());
 		}
+		
 		/*
 		 *
 		 * 
