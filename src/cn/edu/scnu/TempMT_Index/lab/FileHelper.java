@@ -15,7 +15,6 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 
 import cn.edu.scnu.TempMT_Index.service.CONTANT;
-import demo.FileScanner;
 
 /**
  * 文件单例模式
@@ -64,7 +63,7 @@ public class FileHelper {
 		}
 	}
 
-	public void writeBinary(String dirName,String fileName, String data) {
+	public void writeBinary(String dirName, String fileName, String data) {
 		// 写文件
 		DataOutputStream dos = null;
 		try {
@@ -130,7 +129,7 @@ public class FileHelper {
 				throw sc.ioException();
 			}
 		} catch (IOException e) {
-			Logger.getLogger(FileScanner.class.getName()).error(e);
+			Logger.getLogger(FileHelper.class.getName()).error(e);
 			e.printStackTrace();
 		} finally {
 			if (inputStream != null) {
@@ -183,14 +182,14 @@ public class FileHelper {
 	}
 
 	public static void main(String[] args) {
-//		FileHelper fh = FileHelper.getInstance();
-//		fh.setDirName(CONTANT.rootPath);
-//		String s = "";
-//		for (int i = 0; i < Math.pow(2, 15); i++) {
-//			s += "test123" + i + "\n";
-//		}
-//		fh.writeBinary("1.dat", s);
-//		fh.setDirName(CONTANT.rootPath + "\\lab");
-//		System.out.println("finished");
+		// FileHelper fh = FileHelper.getInstance();
+		// fh.setDirName(CONTANT.rootPath);
+		// String s = "";
+		// for (int i = 0; i < Math.pow(2, 15); i++) {
+		// s += "test123" + i + "\n";
+		// }
+		// fh.writeBinary("1.dat", s);
+		// fh.setDirName(CONTANT.rootPath + "\\lab");
+		// System.out.println("finished");
 	}
 }

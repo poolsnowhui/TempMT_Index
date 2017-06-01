@@ -1,6 +1,0 @@
-数据量:1000000 查询跨度:0.1 线程个数:2 开销 机器自身核心数：2
-策略类型:queryThreadAverage 34
-策略类型:queryThreadCross 24
-策略类型:queryThreadFrontAverage 47
-策略类型:queryThreadFrontCross 21
-
