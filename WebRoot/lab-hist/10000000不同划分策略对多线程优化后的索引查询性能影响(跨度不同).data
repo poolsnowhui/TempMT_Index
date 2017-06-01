@@ -1,0 +1,31 @@
+数据量:10000000 查询跨度:0.1 线程个数:8 开销 机器自身核心数：8
+策略类型:queryThreadAverage 98
+策略类型:queryThreadCross 47
+策略类型:queryThreadFrontAverage 100
+策略类型:queryThreadFrontCross 46
+数据量:10000000 查询跨度:0.2 线程个数:8 开销 机器自身核心数：8
+策略类型:queryThreadAverage 74
+策略类型:queryThreadCross 41
+策略类型:queryThreadFrontAverage 85
+策略类型:queryThreadFrontCross 40
+数据量:10000000 查询跨度:0.3 线程个数:8 开销 机器自身核心数：8
+策略类型:queryThreadAverage 62
+策略类型:queryThreadCross 33
+策略类型:queryThreadFrontAverage 68
+策略类型:queryThreadFrontCross 32
+数据量:10000000 查询跨度:0.4 线程个数:8 开销 机器自身核心数：8
+策略类型:queryThreadAverage 50
+策略类型:queryThreadCross 25
+策略类型:queryThreadFrontAverage 52
+策略类型:queryThreadFrontCross 24
+数据量:10000000 查询跨度:0.5 线程个数:8 开销 机器自身核心数：8
+策略类型:queryThreadAverage 40
+策略类型:queryThreadCross 19
+策略类型:queryThreadFrontAverage 40
+策略类型:queryThreadFrontCross 19
+数据量:10000000 查询跨度:0.6 线程个数:8 开销 机器自身核心数：8
+策略类型:queryThreadAverage 32
+策略类型:queryThreadCross 15
+策略类型:queryThreadFrontAverage 31
+策略类型:queryThreadFrontCross 15
+

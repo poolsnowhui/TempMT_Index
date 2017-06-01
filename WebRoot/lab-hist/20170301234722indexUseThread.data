@@ -1,0 +1,6 @@
+数据量:6000000 查询跨度:0.1 线程个数:8 开销 
+策略类型:queryThreadAverage 152
+策略类型:queryThreadCross 62
+策略类型:queryThreadFrontAverage 131
+策略类型:queryThreadFrontCross 60
+
