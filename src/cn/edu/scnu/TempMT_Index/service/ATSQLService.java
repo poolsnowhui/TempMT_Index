@@ -1,12 +1,10 @@
 package cn.edu.scnu.TempMT_Index.service;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import cn.edu.scnu.TempMT_Index.dao.DAOFactory;
 
-public class QueryService {
-
+public class ATSQLService {
 	public String translate(String atsql, String lob, String isFromDisk, String[] parameters) {
 		ReMessage reMessage = new ReMessage();
 		String str = "";
@@ -17,12 +15,12 @@ public class QueryService {
 			System.err.println("atsql空串");
 			return "";
 		}
-		// 1.格式化atsql
-		Format format = new Format();
-		strarray = format.format(atsql);
-
-		// 2.atsql语句进行分类，并转译
 		try {
+			// 1.格式化atsql
+			Format format = new Format();
+			strarray = format.format(atsql);
+
+			// 2.atsql语句进行分类，并转译
 			for (int i = 0; i < strarray.size(); i++) {
 				if (strarray.get(i).equalsIgnoreCase(DQL.select)) {
 					// 111,第一个1：lob；第二个1：磁盘；第三个1：二分法
@@ -35,19 +33,16 @@ public class QueryService {
 				} else if (strarray.get(i).equalsIgnoreCase(DDL.create) || strarray.get(i).equalsIgnoreCase(DDL.drop)) {
 					DDL ddl = new DDL();
 					str = ddl.translate(atsql, parameters);
+					reMessage =ddl.getMessage();
 
 				} else if (strarray.get(i).equalsIgnoreCase(DML.insert)) {
 					DML dml = new DML();
 					str = dml.translate(atsql, parameters);
+					reMessage =dml.getMessage();
 				}
 			}
 			if (str == "") {
-				try {
-					DAOFactory.getInstance().executeQuery(atsql);
-				} catch (SQLException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e.getMessage());
-				}
+				DAOFactory.getInstance().executeQuery(atsql);
 			}
 		} catch (Exception e) {
 			reMessage.setErrMessage(e.getMessage());

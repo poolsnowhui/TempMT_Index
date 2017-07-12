@@ -2,8 +2,8 @@
  * Copyright 2017 TempMT_Index
  * All right reserved.
  *
- * author:CXH
- * create date: 2017年3月29日 下午4:56:07
+ * author:chixh
+ * create date: 2017年7月7日 下午1:44:42
  */
 package cn.edu.scnu.TempMT_Index.dao;
 
@@ -24,17 +24,17 @@ import org.apache.log4j.Logger;
 import cn.edu.scnu.TempMT_Index.service.CONTANT;
 
 /**
- * @author CXH
+ * @author chixh
  *
  */
-public class MySQLDAO implements IDAO {
-	private static MySQLDAO instance = new MySQLDAO();
+public class MSSQLDAO implements IDAO {
+	private static MSSQLDAO instance = new MSSQLDAO();
 	private static Connection conn;
 
-	private MySQLDAO() {
+	private MSSQLDAO() {
 		try {
 			Properties pp = new Properties();
-			InputStream fis = new FileInputStream(CONTANT.confPath + "\\" + DAOFactory.MySQL + ".properties");
+			InputStream fis = new FileInputStream(CONTANT.confPath + "\\" + DAOFactory.MSSQL + ".properties");
 			pp.load(fis);
 			String driver = pp.getProperty("driver");
 			String username = pp.getProperty("username");
@@ -42,50 +42,20 @@ public class MySQLDAO implements IDAO {
 			String url = pp.getProperty("url");
 			String database = pp.getProperty("database");
 			String parameter = pp.getProperty("parameter");
-			Class.forName(driver);
-			conn = DriverManager.getConnection(url + database + parameter, username, password);
-		} catch (Exception e) {
-			// 错误处理
-			Logger.getLogger(MySQLDAO.class).error(e);
-			e.printStackTrace();
-		}
-	}
 
-	/**
-	 * @param username
-	 * @param password
-	 */
-	private MySQLDAO(String username, String password) {
-		try {
-			Properties pp = new Properties();
-			InputStream fis = new FileInputStream(CONTANT.confPath + "\\" + DAOFactory.MySQL + ".properties");
-			pp.load(fis);
-			String driver = pp.getProperty("driver");
-			String url = pp.getProperty("url");
-			String database = pp.getProperty("database");
-			String parameter = pp.getProperty("parameter");
 			Class.forName(driver);
-			conn = DriverManager.getConnection(url + database + parameter, username, password);
+			conn = DriverManager.getConnection(url + parameter + database, username, password);
 		} catch (Exception e) {
 			// 错误处理
 			Logger.getLogger(this.getClass()).error(e);
-			throw new RuntimeException();
+			e.printStackTrace();
 		}
-	}
-
-	public static MySQLDAO getInstance() {
-		return instance;
-	}
-
-	public static MySQLDAO getInstance(String username, String password) {
-		instance = new MySQLDAO(username, password);
-		return instance;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see demo.IDAO#executeQuery(java.lang.String)
+	 * @see cn.edu.scnu.TempMT_Index.dao.IDAO#executeQuery(java.lang.String)
 	 */
 	@Override
 	public List<Object[]> executeQuery(String sql) throws SQLException {
@@ -112,11 +82,9 @@ public class MySQLDAO implements IDAO {
 			}
 			return result;
 		} catch (SQLException e) {
-			// 抛出异常，抛出运行异常，可以给调用该函数的函数一个选择
-			e.printStackTrace();
+			// 错误处理
 			Logger.getLogger(this.getClass()).error(e);
-			// 可以处理，也可以放弃处理
-			throw new RuntimeException(e.getMessage());
+			throw e;
 		} finally {
 			// 关闭资源
 			if (rs != null && !rs.isClosed())
@@ -129,7 +97,7 @@ public class MySQLDAO implements IDAO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see demo.IDAO#executeQuery(java.lang.String[])
+	 * @see cn.edu.scnu.TempMT_Index.dao.IDAO#executeQuery(java.lang.String[])
 	 */
 	@Override
 	public ResultSet executeQuery(String[] sql) throws SQLException {
@@ -140,7 +108,7 @@ public class MySQLDAO implements IDAO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see demo.IDAO#execute(java.lang.String)
+	 * @see cn.edu.scnu.TempMT_Index.dao.IDAO#execute(java.lang.String[])
 	 */
 	@Override
 	public int execute(String... sql) throws SQLException {
@@ -157,7 +125,7 @@ public class MySQLDAO implements IDAO {
 			conn.rollback();
 			// 错误处理
 			Logger.getLogger(this.getClass()).error(e);
-			throw new RuntimeException();
+			throw e;
 		} finally {
 			// 关闭资源
 			if (ps != null && !ps.isClosed())
@@ -168,31 +136,18 @@ public class MySQLDAO implements IDAO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see demo.IDAO#callPro(java.lang.String)
+	 * @see cn.edu.scnu.TempMT_Index.dao.IDAO#callPro(java.lang.String)
 	 */
 	@Override
 	public boolean callPro(String sql) throws SQLException {
-		PreparedStatement ps = null;
-		try {
-			ps = conn.prepareCall(sql);
-			return ps.execute();
-		} catch (SQLException e) {
-			conn.rollback();
-			// 错误处理
-			Logger.getLogger(this.getClass()).error(e);
-			throw new RuntimeException();
-		} finally {
-			// 关闭资源
-			if (ps != null && !ps.isClosed())
-				ps.close();
-		}
-
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see demo.IDAO#getConnection()
+	 * @see cn.edu.scnu.TempMT_Index.dao.IDAO#getConnection()
 	 */
 	@Override
 	public Connection getConnection() {
@@ -202,27 +157,19 @@ public class MySQLDAO implements IDAO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see demo.IDAO#closeIDAO()
+	 * @see cn.edu.scnu.TempMT_Index.dao.IDAO#closeIDAO()
 	 */
 	@Override
 	public void closeIDAO() throws SQLException {
 		conn.close();
+
 	}
 
-	public static void main(String[] args) {
-		try {
-			List<Object[]> executeQuery = MySQLDAO.getInstance().executeQuery("select * from student;");
-			for (Object[] objects : executeQuery) {
-				System.out.println(objects[1]);
-			}
-		} catch (SQLException e) {
-			Logger.getLogger(new Object() {
-				// 静态方法中获取当前类名
-				public Class<?> getClassForStatic() {
-					return this.getClass();
-				}
-			}.getClassForStatic()).error(e);
-			throw new RuntimeException();
-		}
+	/**
+	 * @return
+	 */
+	public static IDAO getInstance() {
+		return instance;
 	}
+
 }

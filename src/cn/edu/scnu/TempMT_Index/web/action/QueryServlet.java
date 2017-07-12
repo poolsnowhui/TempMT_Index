@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cn.edu.scnu.TempMT_Index.service.QueryService;
+import cn.edu.scnu.TempMT_Index.service.ATSQLService;
 
 public class QueryServlet extends HttpServlet {
 	/**
@@ -28,7 +28,7 @@ public class QueryServlet extends HttpServlet {
 		System.out.println("atsql="+atsql);
 		System.out.println("lob"+lob);
 		System.out.println("isFromDisk"+isFromDisk);
-		QueryService queryService=new QueryService();
+		ATSQLService queryService=new ATSQLService();
 		String str=queryService.translate(atsql, lob,isFromDisk ,null);
 		out.print(str);
 	}

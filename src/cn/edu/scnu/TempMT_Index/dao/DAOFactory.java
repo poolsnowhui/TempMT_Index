@@ -7,37 +7,44 @@
  */
 package cn.edu.scnu.TempMT_Index.dao;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import cn.edu.scnu.TempMT_Index.service.CONTANT;
+
 /**
  * @author CXH
  *
  */
 public class DAOFactory {
-	public static final String Mysql = "Mysql";
+	public static final String MySQL = "MySQL";
 	public static final String Oracle = "Oracle";
-	public static final String SQLserver = "SQLserver";
+	public static final String MSSQL = "MSSQL";
 
+	/**
+	 * 默认MySQL的数据库
+	 * 
+	 * @return
+	 */
 	public static IDAO getInstance() {
-		return MysqlDAO.getInstance();
+		return getInstance(MySQL);
 	}
 
 	public static IDAO getInstance(String DAOname) {
 		if (!setDAOname(DAOname))
 			return null;
 		switch (DAOname) {
-		case Mysql:
-			return MysqlDAO.getInstance();
+		case MySQL:
+			return MySQLDAO.getInstance();
 		case Oracle:
 			// TODO
 			return null;
-		case SQLserver:
-			// TODO
-			return null;
+		case MSSQL:
+			return MSSQLDAO.getInstance();
 
 		default:
 			return null;
@@ -47,22 +54,10 @@ public class DAOFactory {
 	public static IDAO getInstance(String DAOname, String username, String password) {
 		if (!setProperties(DAOname, username, password))
 			return null;
-		switch (DAOname) {
-		case Mysql:
-			return MysqlDAO.getInstance();
-		case Oracle:
-			// TODO
-			return null;
-		case SQLserver:
-			// TODO
-			return null;
-
-		default:
-			return null;
-		}
+		return getInstance(DAOname);
 	}
 
-	private static boolean setProperties(String DAOname, String username, String password) {
+	public static boolean setProperties(String DAOname, String username, String password) {
 		if (!setDAOname(DAOname))
 			return false;
 		if (!setUsername(username))
@@ -79,14 +74,19 @@ public class DAOFactory {
 	private static boolean setPassword(String password) {
 		try {
 			Properties pp = new Properties();
-			InputStream fis = DAOFactory.class.getClassLoader().getResourceAsStream("dbs.properties");
+			InputStream fis = new FileInputStream(CONTANT.confPath + "\\" + "dbs.properties");
 			pp.load(fis);
 			String basetype = pp.getProperty("basetype");
-			fis = IDAO.class.getClassLoader().getResourceAsStream(basetype + ".properties");
+			fis = new FileInputStream(CONTANT.confPath + "\\" + basetype + ".properties");
 			pp.load(fis);
 			pp.setProperty("password", password);
 		} catch (IOException e) {
-			Logger.getLogger(IDAO.class).error(e);
+			Logger.getLogger(new Object() {
+				// 静态方法中获取当前类名
+				public Class<?> getClassForStatic() {
+					return this.getClass();
+				}
+			}.getClassForStatic()).error(e);
 			throw new RuntimeException();
 		}
 		return true;
@@ -99,10 +99,10 @@ public class DAOFactory {
 	private static boolean setUsername(String username) {
 		try {
 			Properties pp = new Properties();
-			InputStream fis = DAOFactory.class.getClassLoader().getResourceAsStream("dbs.properties");
+			InputStream fis = new FileInputStream(CONTANT.confPath + "\\" + "dbs.properties");
 			pp.load(fis);
 			String basetype = pp.getProperty("basetype");
-			fis = IDAO.class.getClassLoader().getResourceAsStream(basetype + ".properties");
+			fis = new FileInputStream(CONTANT.confPath + "\\" + basetype + ".properties");
 			pp.load(fis);
 			pp.setProperty("username", username);
 		} catch (IOException e) {
@@ -119,12 +119,12 @@ public class DAOFactory {
 	private static boolean setDAOname(String DAOname) {
 		try {
 			Properties pp = new Properties();
-			InputStream fis = DAOFactory.class.getClassLoader().getResourceAsStream("dbs.properties");
+			InputStream fis = new FileInputStream(CONTANT.confPath + "\\" + "dbs.properties");
 			pp.load(fis);
 			pp.setProperty("basetype", DAOname);
 		} catch (IOException e) {
-			Logger.getLogger(IDAO.class).error(e);
-			throw new RuntimeException();
+			Logger.getLogger(DAOFactory.class).error(e);
+//			throw new RuntimeException();
 		}
 		return true;
 	}

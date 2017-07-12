@@ -14,6 +14,7 @@ public class DML {
 	public static final String values = "values";
 	private ArrayList<String> strarray;
 	private String mysql;
+	private ReMessage message;
 
 	/**
 	 * 忽略大小写匹配
@@ -131,9 +132,17 @@ public class DML {
 			// 可以处理，也可以放弃处理
 			throw new RuntimeException(e.getMessage());
 		}
+		message.setErrMessage("插入数据成功");
 		return "1" + "," + "insert data" + "," + "success";
 	}
 
+
+	/**
+	 * @return
+	 */
+	public ReMessage getMessage() {
+		return message;
+	}
 	public static void main(String[] args) {
 		DML dml = new DML();
 		String sql = dml.translate(

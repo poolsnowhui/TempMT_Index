@@ -1,4 +1,6 @@
-/Mysql.properties
-/cn/
+/MSSQL.properties
+/MySQL.properties
+/Oracle.properties
 /dbs.properties
-/demo/
+/log4j.properties
+/cn/

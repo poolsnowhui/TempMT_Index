@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import cn.edu.scnu.TempMT_Index.dao.DAOFactory;
 
 /**
@@ -70,30 +72,38 @@ public class DQL {
 	private ReMessage reMessage = new ReMessage();// 提示信息
 
 	public String translate(String atsql, String[] parameters) {
-		// 1.产生sql
-		reMessage.setAtsql(atsql);
-		productMysql(atsql, parameters);
-		// 2.mysql查
-		if (haveValidtime) {
-			if (haveProjection) {
-				dqlResult = projectQuery(mysql, parameters);
-				return dqlResult;
-			} else if (haveSnapshot) {
-				dqlResult = snapQuery(mysql, parameters);
-				return dqlResult;
-			} else if (havePeriod) {
-				if ((strategy & 8) == 8)
-					// 使用时态索引
-					return period(vtsdatetime, vtedatetime, tableName, mysql, parameters);
-				else {
-					dqlResult = sqlToStrVT(mysql, parameters);
+		try {
+			// 1.产生sql
+			reMessage.setAtsql(atsql);
+			productMysql(atsql, parameters);
+			// 2.mysql查
+			if (haveValidtime) {
+				if (haveProjection) {
+					dqlResult = projectQuery(mysql, parameters);
+					return dqlResult;
+				} else if (haveSnapshot) {
+					dqlResult = snapQuery(mysql, parameters);
+					return dqlResult;
+				} else if (havePeriod) {
+					if ((strategy & 8) == 8)
+						// 使用时态索引
+						return period(vtsdatetime, vtedatetime, tableName, mysql, parameters);
+					else {
+						dqlResult = sqlToStrVT(mysql, parameters);
+					}
+				} else {// 跨度，连接等其他带有效时间情况（不用额外使用程序处理的情况）
+					dqlResult = sqlToStrVT(mysql, parameters);// 带有效时间的查询
 				}
-			} else {// 跨度，连接等其他带有效时间情况（不用额外使用程序处理的情况）
-				dqlResult = sqlToStrVT(mysql, parameters);// 带有效时间的查询
+			} else {
+				// 语句里不带有效时间的情况
+				dqlResult = sqlToStr(mysql, parameters);// 不带有效时间的查询
 			}
-		} else {
-			// 语句里不带有效时间的情况
-			dqlResult = sqlToStr(mysql, parameters);// 不带有效时间的查询
+		} catch (Exception e) {
+			// 抛出异常，抛出运行异常，可以给调用该函数的函数一个选择
+			e.printStackTrace();
+			Logger.getLogger(this.getClass()).error(e);
+			// 可以处理，也可以放弃处理
+			throw new RuntimeException(e.getMessage());
 		}
 		return dqlResult;
 
@@ -460,17 +470,19 @@ public class DQL {
 		long after = System.currentTimeMillis();
 		if (sql == "")
 			sql = "select * from " + tableName;
-		List<Object[]> source=null;
+		List<Object[]> source = null;
 		try {
 			source = DAOFactory.getInstance().executeQuery(sql);
 		} catch (Exception e) {
-			e.printStackTrace();// 开发阶段
 			// 抛出异常，抛出运行异常，可以给调用该函数的函数一个选择
+			e.printStackTrace();// 开发阶段
+			reMessage.setErrMessage(e.getMessage());
+			Logger.getLogger(this.getClass()).error(e);
 			// 可以处理，也可以放弃处理
 			throw new RuntimeException(e.getMessage());
 		}
 		StringBuffer result = new StringBuffer();
-		if (source != null)
+		if (source != null&&source.get(0)!=null)
 			result.append("" + (source.get(0).length - 2));
 		for (int i = 0; i < source.size(); i++) {
 			for (int j = 0; j < source.get(i).length - 2; j++) {
@@ -504,11 +516,14 @@ public class DQL {
 		long after = System.currentTimeMillis();
 		if (sql == "")
 			sql = "select * from " + tableName;
-		List<Object[]> source =null;
+		List<Object[]> source = null;
 		try {
 			source = DAOFactory.getInstance().executeQuery(sql);
 		} catch (SQLException e) {
+			// 抛出异常，抛出运行异常，可以给调用该函数的函数一个选择
 			e.printStackTrace();
+			Logger.getLogger(this.getClass()).error(e);
+			// 可以处理，也可以放弃处理
 			throw new RuntimeException(e.getMessage());
 		}
 		StringBuffer result = new StringBuffer();

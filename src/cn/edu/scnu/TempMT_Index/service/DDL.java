@@ -21,7 +21,7 @@ public class DDL {
 	private ArrayList<String> strarray;
 	private String mysql;
 	private boolean flagAsValidtime = false;// 是否有as validtime字段
-	private String message;
+	private ReMessage message;
 	private String tablename = "";
 
 	private boolean ischeck(int index, String str2) {
@@ -67,16 +67,16 @@ public class DDL {
 			// 可以处理，也可以放弃处理
 			throw new RuntimeException(e.getMessage());
 		}
-		setMessage("定义表结构" + tablename + "成功");
+		message.setErrMessage("定义表结构" + tablename + "成功");
 		return "1" + "," + "define table" + "," + "success";
 
 	}
 
-	public String getMessage() {
+	public ReMessage getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(ReMessage message) {
 		this.message = message;
 	}
 
